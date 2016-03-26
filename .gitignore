@@ -1,6 +1,12 @@
 *
-!.gitignore
 !*.v
+!.gitignore
+*
+!*.v
+*
 !*.ucf
+*
 !*.vh
+*
 !*.coe
+
