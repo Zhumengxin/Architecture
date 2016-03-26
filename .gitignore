@@ -71,3 +71,9 @@ Lab1/ipcore_dir/ROM.asy
 Lab1/ipcore_dir/ROM.v
 
 Lab1/ipcore_dir/ROM/blk_mem_gen_v7_3_readme.txt
+
+*.swp
+
+*.swp
+
+.gitignore.swp
