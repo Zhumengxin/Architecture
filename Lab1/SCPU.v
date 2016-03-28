@@ -40,8 +40,7 @@ module SCPU(// debug
 	output wire [31:0] mem_dout,  // data writing to memory
 	input wire [31:0] mem_din  // data read from memory
     );
-	//wire [5:0] OPcode;
-	//wire [5:0] Fun;
+	
 	 wire mem_w;
 	 wire RegDst;
 	 wire ALUSrc_B;
@@ -92,7 +91,7 @@ module SCPU(// debug
 		.DatatoReg(DatatoReg),
 		.Branch(Branch),
 		.ALU_Control(ALU_Control),
-		.inst_field(inst_data[25:0]),
+		.inst_data(inst_data[31:0]),
 		.Data_in(mem_din),
 		.ALU_out(mem_addr),
 		.Data_out(mem_dout),

@@ -23,8 +23,8 @@ module mips(
       `ifdef DEBUG
 		input wire debug_en,
 		input wire debug_step,
-		input wire debug_addr,
-		output wire debug_data,
+		input wire [6:0] debug_addr,
+		output wire [31:0] debug_data,
 	   `endif
 		input wire clk,
 		input wire rst,

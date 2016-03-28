@@ -59,7 +59,9 @@ module mips_test;
 		debug_en=1;
 		// Wait 100 ns for global reset to finish
 		#100;
+		debug_addr=4'b0001;
       debug_step=1;
+		#100;
 		debug_step=0;
 		
 		// Add stimulus here

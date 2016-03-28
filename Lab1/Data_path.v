@@ -37,7 +37,7 @@ module Data_path(
 		input  [1:0] DatatoReg,
 		input  [1:0] Branch,
 		input  [2:0] ALU_Control,
-		input [25:0] inst_field,
+		input [31:0] inst_data,
 		input [31:0] Data_in,
 		output[31:0] ALU_out,
 		output[31:0] Data_out,
@@ -80,21 +80,21 @@ module Data_path(
 	
 	always @(posedge clk) begin
 		case (debug_addr[4:0])
-			0: debug_data_signal <= 0;
-			1: debug_data_signal <= {6'b0,inst_field};
+			0: debug_data_signal <= PC_out;
+			1: debug_data_signal <= inst_data;
 			2: debug_data_signal <= 0;
 			3: debug_data_signal <= 0;
 			4: debug_data_signal <= 0;
 			5: debug_data_signal <= 0;
 			6: debug_data_signal <= 0;
 			7: debug_data_signal <= 0;
-			8: debug_data_signal <= {27'b0, inst_field[25:21]};
+			8: debug_data_signal <= {27'b0, inst_data[25:21]};
 			9: debug_data_signal <= 0;//data_rs;
-			10: debug_data_signal <= {27'b0, inst_field[20:16]};
+			10: debug_data_signal <= {27'b0, inst_data[20:16]};
 			11: debug_data_signal <= 0;//data_rt;
-			12: debug_data_signal <= 0;//data_imm;
-			13: debug_data_signal <= 0;//opa;
-			14: debug_data_signal <= 0;//opb;
+			12: debug_data_signal <= Imm_32;//data_imm;
+			13: debug_data_signal <= ALU_A;//opa;
+			14: debug_data_signal <= ALU_B;//opb;
 			15: debug_data_signal <= ALU_out_DUMMY;
 			16: debug_data_signal <= 0;
 			17: debug_data_signal <= 0;
@@ -121,22 +121,22 @@ module Data_path(
 						  .b(32'b00000000_00000000_00000000_00000100), 
 						  .c(pc_4[31:0]));
 	
-	Ext_32  Ext32 (.imm_16(inst_field[15:0]), 
+	Ext_32  Ext32 (.imm_16(inst_data[15:0]), 
 					  .Imm_32(Imm_32[31:0]));
 	
 	mux2to1_5  mux1 (.a(5'b11111), 
-						 .b(inst_field[20:16]), 
+						 .b(inst_data[20:16]), 
 						 .sel(Jal), 
 						 .o(wt_addr_1[4:0]));
 	
-	mux2to1_5  mux2 (.a(inst_field[15:11]), 
+	mux2to1_5  mux2 (.a(inst_data[15:11]), 
 						 .b(wt_addr_1[4:0]), 
 						 .sel(RegDst), 
 						 .o(wt_addr_2[4:0]));
 	
 	mux4to1_32  mux3 (.a(ALU_out_DUMMY[31:0]), 
 						  .b(Data_in[31:0]), 
-						  .c({inst_field[15:0], 16'b00000000_00000000}), 
+						  .c({inst_data[15:0], 16'b00000000_00000000}), 
 						  .d(pc_4[31:0]), 
 						  .sel(DatatoReg[1:0]), 
 						  .o(wt_data[31:0]));
@@ -148,7 +148,7 @@ module Data_path(
 	
 	mux4to1_32  mux5 (.a(pc_4[31:0]), 
 						  .b(branch_pc[31:0]), 
-						  .c({pc_4[31:28], inst_field[25:0], 2'b00}), 
+						  .c({pc_4[31:28], inst_data[25:0], 2'b00}), 
 						  .d(ALU_A[31:0]), 
 						  .sel(Branch[1:0]), 
 						  .o(pc_next[31:0]));
@@ -163,8 +163,8 @@ module Data_path(
 	Regs  U2 (.clk(clk), 
 				.L_S(RegWrite && cpu_en), 
 				.rst(rst), 
-				.R_addr_A(inst_field[25:21]), 
-				.R_addr_B(inst_field[20:16]), 
+				.R_addr_A(inst_data[25:21]), 
+				.R_addr_B(inst_data[20:16]), 
 				.Wt_addr(wt_addr_2[4:0]), 
 				.Wt_data(wt_data[31:0]), 
 				.rdata_A(ALU_A[31:0]), 
