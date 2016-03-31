@@ -27,11 +27,11 @@ module ALU(A,
            res, 
            zero);
 
-    input [31:0] A;
+    input wire [31:0] A;
     input [2:0] ALU_operation;
-    input [31:0] B;
+    input wire [31:0] B;
    output overflow;
-   output [31:0] res;
+   output  [31:0] res;
    output zero;
    
    wire N0;
@@ -62,8 +62,8 @@ module ALU(A,
    nor32  XLXI_11 (.A(A[31:0]), 
                   .B(B[31:0]), 
                   .res(XLXN_8[31:0]));
-   srl32  XLXI_12 (.A(A[31:0]), 
-                  .B(B[31:0]), 
+   srl32  XLXI_12 (.A(B[31:0]), 
+                  .B(A[4:0]), 
                   .res(XLXN_9[31:0]));
    xor32  XLXI_13 (.A(XLXN_48[31:0]), 
                   .B(B[31:0]), 

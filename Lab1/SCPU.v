@@ -43,7 +43,7 @@ module SCPU(// debug
 	
 	 wire mem_w;
 	 wire RegDst;
-	 wire ALUSrc_B;
+	 wire ALUSrc_B,ALUSrc_A;
 	 wire Jal;
 	 wire RegWrite;
 	 wire [1:0] DatatoReg;
@@ -66,6 +66,7 @@ module SCPU(// debug
 		.zero(zero),
 		.RegDst(RegDst),
 		.ALUSrc_B(ALUSrc_B),
+		.ALUSrc_A(ALUSrc_A),
 		.Jal(Jal),
 		.RegWrite(RegWrite),
 		.mem_w(mem_w),
@@ -79,13 +80,13 @@ module SCPU(// debug
 	 
 	 Data_path Data_path(
 		.clk(clk),
-		.rst(rst),
 		`ifdef DEBUG
 		.debug_addr(debug_addr[5:0]),
 		.debug_data(debug_data),
 		`endif
 		.RegDst(RegDst),
 		.ALUSrc_B(ALUSrc_B),
+		.ALUSrc_A(ALUSrc_A),
 		.Jal(Jal),
 		.RegWrite(RegWrite),
 		.DatatoReg(DatatoReg),

@@ -67,6 +67,7 @@ module display (
 				21: strdata[127:72] <= "MEMDATW";
 				22: strdata[127:72] <= "WB-ADDR";
 				23: strdata[127:72] <= "WB-DATA";
+				24: strdata[127:72] <="TESTWRD";
 				default: strdata[127:72] <= "RESERVE";
 			endcase
 			3'b010: strdata[127:72] <= {"CP0S-", num2str(addr[5:4]), num2str(addr[3:0])};

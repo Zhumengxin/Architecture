@@ -32,6 +32,7 @@ module SCPU_control(
 	input zero,
 	output reg RegDst,
 	output reg ALUSrc_B,
+	output reg ALUSrc_A,
 	output reg Jal,
 	output reg RegWrite,
 	output     mem_w,
@@ -45,38 +46,38 @@ module SCPU_control(
    
 	reg MemWrite, MemRead;
 	
-	`define CPU_ctrl_signals {RegDst, ALUSrc_B, DatatoReg, RegWrite, MemRead, MemWrite, Branch, Jal, ALU_Control}
+	`define CPU_ctrl_signals {RegDst, ALUSrc_B, DatatoReg, RegWrite, MemRead, MemWrite, Branch, Jal, ALU_Control,ALUSrc_A}
 	
 	assign mem_w = MemWrite && (~MemRead) && cpu_en;
 	
 	always @ (Fun or OPcode or zero) begin
 		case(OPcode)
-			6'b100011: begin `CPU_ctrl_signals <= 13'b0_1_01_1_1_0_00_0_010; end // load
-			6'b101011: begin `CPU_ctrl_signals <= 13'bx_1_xx_0_0_1_00_0_010; end // store
-			6'b000100: begin `CPU_ctrl_signals <= {8'bx_0_xx_0_0_0_0, ~zero, 4'b0_110}; end // beq
-			6'b000010: begin `CPU_ctrl_signals <= 13'bx_x_xx_0_0_0_10_0_xxx; end // jump
-			6'h24: begin `CPU_ctrl_signals <= 13'b0_1_00_1_0_0_00_0_111; end // slti
-			6'h0A: begin `CPU_ctrl_signals <= 13'b0_1_00_1_0_0_00_0_010; end // addi
-			6'h0C: begin `CPU_ctrl_signals <= 13'b0_1_00_1_0_0_00_0_000; end // andi
-			6'h0D: begin `CPU_ctrl_signals <= 13'b0_1_00_1_0_0_00_0_001; end // ori
-			6'h0E: begin `CPU_ctrl_signals <= 13'b0_1_00_1_0_0_00_0_011; end // xori
-			6'h0F: begin `CPU_ctrl_signals <= 13'b0_x_10_1_0_0_00_0_xxx; end // lui
-			6'h03: begin `CPU_ctrl_signals <= 13'b0_x_11_1_0_0_10_1_xxx; end // Jal
-			6'h05: begin `CPU_ctrl_signals <= {8'bx_0_xx_0_0_0_0, zero, 4'b0_110}; end // bne
+			6'b100011: begin `CPU_ctrl_signals <= 14'b0_1_01_1_1_0_00_0_010_0; end // load
+			6'b101011: begin `CPU_ctrl_signals <= 14'bx_1_xx_0_0_1_00_0_010_0; end // store
+			6'b000100: begin `CPU_ctrl_signals <= {8'bx_0_xx_0_0_0_0, ~zero, 5'b0_110_0}; end // beq
+			6'b000010: begin `CPU_ctrl_signals <= 14'bx_x_xx_0_0_0_10_0_xxx_0; end // jump
+			6'h24: begin `CPU_ctrl_signals <= 14'b0_1_00_1_0_0_00_0_111_0; end // slti
+			6'h08: begin `CPU_ctrl_signals <= 14'b0_1_00_1_0_0_00_0_010_0; end // addi
+			6'h0C: begin `CPU_ctrl_signals <= 14'b0_1_00_1_0_0_00_0_000_0; end // andi
+			6'h0D: begin `CPU_ctrl_signals <= 14'b0_1_00_1_0_0_00_0_001_0; end // ori
+			6'h0E: begin `CPU_ctrl_signals <= 14'b0_1_00_1_0_0_00_0_011_0; end // xori
+			6'h0F: begin `CPU_ctrl_signals <= 14'b0_x_10_1_0_0_00_0_xxx_0; end // lui
+			6'h03: begin `CPU_ctrl_signals <= 14'b0_x_11_1_0_0_10_1_xxx_0; end // Jal
+			6'h05: begin `CPU_ctrl_signals <= {8'bx_0_xx_0_0_0_0, zero, 5'b0_110_0}; end // bne
 			6'b000000: begin case(Fun)
-				6'b100000: begin `CPU_ctrl_signals <= 13'b1_0_00_1_0_0_00_0_010; end // add
-				6'b100010: begin `CPU_ctrl_signals <= 13'b1_0_00_1_0_0_00_0_110; end // sub
-				6'b100100: begin `CPU_ctrl_signals <= 13'b1_0_00_1_0_0_00_0_000; end // and
-				6'b100101: begin `CPU_ctrl_signals <= 13'b1_0_00_1_0_0_00_0_001; end // or
-				6'b101010: begin `CPU_ctrl_signals <= 13'b1_0_00_1_0_0_00_0_111; end // slt
-				6'b100111: begin `CPU_ctrl_signals <= 13'b1_0_00_1_0_0_00_0_100; end // nor
-				6'b000010: begin `CPU_ctrl_signals <= 13'b1_0_00_1_0_0_00_0_101; end // srl
-				6'b010110: begin `CPU_ctrl_signals <= 13'b1_0_00_1_0_0_00_0_011; end // xor
-				6'h8: begin `CPU_ctrl_signals <= 13'bx_x_xx_0_0_0_11_0_xxx; end // jr
-				6'h9: begin `CPU_ctrl_signals <= 13'b0_1_11_1_0_0_11_0_xxx; end // Jalr
-				default: begin `CPU_ctrl_signals <= 13'b0; end
+				6'b100000: begin `CPU_ctrl_signals <= 14'b1_0_00_1_0_0_00_0_010_0; end // add
+				6'b100010: begin `CPU_ctrl_signals <= 14'b1_0_00_1_0_0_00_0_110_0; end // sub
+				6'b100100: begin `CPU_ctrl_signals <= 14'b1_0_00_1_0_0_00_0_000_0; end // and
+				6'b100101: begin `CPU_ctrl_signals <= 14'b1_0_00_1_0_0_00_0_001_0; end // or
+				6'b101010: begin `CPU_ctrl_signals <= 14'b1_0_00_1_0_0_00_0_111_0; end // slt
+				6'b100111: begin `CPU_ctrl_signals <= 14'b1_0_00_1_0_0_00_0_100_0; end // nor
+				6'b000010: begin `CPU_ctrl_signals <= 14'b1_0_00_1_0_0_00_0_101_1; end // srl
+				6'b010110: begin `CPU_ctrl_signals <= 14'b1_0_00_1_0_0_00_0_011_0; end // xor
+				6'h8: begin `CPU_ctrl_signals <= 14'bx_x_xx_0_0_0_11_0_xxx_0; end // jr
+				6'h9: begin `CPU_ctrl_signals <= 14'b0_1_11_1_0_0_11_0_xxx_0; end // Jalr
+				default: begin `CPU_ctrl_signals <= 14'b0; end
 			endcase end
-			default: begin `CPU_ctrl_signals <= 13'b0; end
+			default: begin `CPU_ctrl_signals <= 14'b0; end
 		endcase
 	end
 	
