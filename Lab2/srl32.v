@@ -6,7 +6,6 @@ module srl32 (
 	//output [31:0] temp,
 	output  [31:0] res );
 	reg [31:0] temp;
-	/*
 	always @ (A or B) begin
 				temp = B[0] ? {1'b0, A[31:1]} : A;
              temp = B[1] ? {2'b0, temp[31:2]} : temp;
@@ -16,7 +15,6 @@ module srl32 (
 	end
 	//assign res = B[6] ? A >> 1 : A;
 	assign res[31:0]=temp[31:0];
-	*/
-	assign res = A>>B;
+	
 	
 endmodule
