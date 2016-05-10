@@ -55,31 +55,30 @@ module Data_path(
 		output overflow    //no use temply
 		
     );
-	reg[31:0] pc_4_if,pc_4_id,pc_4_exe,pc_4_mem;
+	reg[31:0] pc_4_if,pc_4_id,pc_4_exe,pc_4_mem,pc_4_wb;
 	wire [31:0] pc_4_if_wire,pc_next;
 	wire[31:0] addr_rs_id,addr_rt_id,addr_rd_id;
 	wire[15:0] imm_16;
 	reg[31:0] inst_addr_id,inst_addr_exe,inst_addr_mem;
-	reg[31:0] inst_data_exe,inst_data_mem;
+	reg[31:0] inst_data_exe,inst_data_mem,inst_data_wb;
 	reg[31:0] Imm_32,Imm_32_exe;
 	wire[31:0] Imm_32_id;
 	wire[31:0] branch_pc;     //the address finally jump using beq and bne
 	reg[4:0]   Reg_addr_mem,Reg_addr_wb;   //reg address that want to be written
 	wire[4:0] wt_addr_1, wt_addr_2;
-	reg[4:0]  addr_rd_exe;
+	reg[4:0]  addr_rd_exe,addr_rt_exe;
 	reg[31:0] data_rs_exe,data_rt_exe,data_rs_mem,data_rt_mem;
 	wire[31:0] data_rs_id,data_rt_id; 
-	reg[31:0] Reg_data_wb;   //data want to be written to reg
+	wire[31:0] Reg_data_wb;   //data want to be written to reg
 	//wire  
-	wire[31:0] wt_data;
 	wire[31:0] ALU_A;
 	wire[31:0] ALU_B;
 	//wire[31:0] ;
-	reg[31:0] ALU_out_mem;
+	reg[31:0] ALU_out_mem,ALU_out_wb;
 	wire[31:0] ALU_out_DUMMY;
 	//wire[31:0] Data_out_DUMMY;
 	wire[31:0] PC_out;
-	
+	reg[31:0] Mem_data;
 	//all signal,others in parameter table
 	reg[2:0] ALU_Control_exe;
 	reg ALUSrc_A_exe,ALUSrc_B_exe;
@@ -87,7 +86,7 @@ module Data_path(
 	reg Jal_exe,Jal_mem;
 	reg RegDst_exe,RegDst_mem;
 	reg RegWrite_exe,RegWrite_mem,RegWrite_wb;
-	reg[1:0] DatatoReg_exe,DatatoReg_mem; 
+	reg[1:0] DatatoReg_exe,DatatoReg_mem,DatatoReg_wb; 
 	reg mem_r_exe,mem_r_mem;
 	reg mem_w_exe,mem_w_mem;
 	reg inst_ren;
@@ -116,15 +115,18 @@ module Data_path(
 			13: debug_data_signal <= ALU_A;
 			14: debug_data_signal <= ALU_B;
 			15: debug_data_signal <= ALU_out_DUMMY;
-			16: debug_data_signal <= 0;
+			16: debug_data_signal <= {27'b0,wt_addr_2[4:0]};
 			17: debug_data_signal <= 0;
 			18: debug_data_signal <= {19'b0, 1, 7'b0,1, 3'b0,0};//mem_wen};
 			19: debug_data_signal <= ALU_out;
 			20: debug_data_signal <= Data_in;
 			21: debug_data_signal <= Data_out;
-			22: debug_data_signal <= {27'b0, wt_addr_2[4:0]};
-			23: debug_data_signal <= wt_data;
-			24: debug_data_signal <= {20'b0,RegDst, ALUSrc_B, DatatoReg, RegWrite, Branch, Jal, ALU_Control,ALUSrc_A};
+			22: debug_data_signal <= {27'b0, Reg_addr_wb[4:0]};
+			23: debug_data_signal <= Reg_data_wb;
+			24: debug_data_signal <= {0,ALU_Control[2:0],  mem_r_control,mem_w_control,ALUSrc_A, ALUSrc_B,    0,Jal,Branch,   RegWrite,RegDst,DatatoReg};
+			25: debug_data_signal <= {0,ALU_Control_exe[2:0],  mem_r_exe,mem_w_exe,ALUSrc_A_exe, ALUSrc_B_exe,    0,Jal_exe,Branch_exe,   RegWrite_exe,RegDst_exe,DatatoReg_exe};
+			26: debug_data_signal <= {4'b0,  mem_r_mem,mem_w_mem,2'b0,    0,Jal_mem,Branch_mem,   RegWrite_mem,RegDst_mem,DatatoReg_mem};
+			27: debug_data_signal <= Mem_data;
 			default: debug_data_signal <= 32'hFFFF_FFFF;
 		endcase
 	end
@@ -133,6 +135,12 @@ module Data_path(
 		debug_data = debug_addr[5] ? debug_data_signal : debug_data_reg;
 	`endif
 	
+
+	initial begin
+		
+	end
+
+
 	assign inst_r = inst_ren;
 	/*
 	assign
@@ -166,7 +174,7 @@ module Data_path(
 						.RFE(1'b0), 
 						.pc(PC_out[31:0]));
 
-	mux4to1_32  ChoosePC (	.a(pc_4_mem[31:0]), 
+	mux4to1_32  ChoosePC (	.a(pc_4_if_wire[31:0]), 
 						.b(branch_pc[31:0]), 
 						.c({pc_4_mem[31:28], inst_data_mem[25:0], 2'b00}), 
 						.d(data_rs_mem[31:0]), 
@@ -265,6 +273,7 @@ module Data_path(
 			RegWrite_exe <= RegWrite;
 			DatatoReg_exe <= DatatoReg;
 			addr_rd_exe <= addr_rd_id;
+			addr_rt_exe <= addr_rt_id;
 			data_rt_exe <= data_rt_id;
 			data_rs_exe <= data_rs_id;
 			
@@ -351,22 +360,13 @@ module Data_path(
 			ALU_out_mem <= ALU_out_DUMMY; //?
 			mem_r_mem <= mem_r_exe; //?
 			mem_w_mem <= mem_w_exe; //?
-			Branch_mem <= Branch_exe;
+			Branch_mem <= {Branch_exe[1],zero};
 			//RegDst_mem <= RegDst_exe;
 			RegWrite_mem <= RegWrite_exe;
 			DatatoReg_mem <=DatatoReg_exe;
 			Reg_addr_mem <= wt_addr_2;
 		end
 	end
-	
-
-
-	mux4to1_32  RegWriteDataChoose (.a(ALU_out_mem[31:0]), 
-						  .b(Data_in[31:0]), 
-						  .c({inst_data_mem[15:0], 16'b00000000_00000000}), 
-						  .d(pc_4_mem[31:0]), 
-						  .sel(DatatoReg[1:0]), 
-						  .o(wt_data[31:0]));
 	
 	assign 
 		ALU_out = ALU_out_mem,
@@ -378,16 +378,33 @@ module Data_path(
 	 always @(*) begin
 		if(wb_rst) begin 
 			RegWrite_wb <=0;
-			Reg_data_wb <=0;
+			
 			Reg_addr_wb <=0;
+			Mem_data <=0;
+			ALU_out_wb <=0;
+			pc_4_wb <= 0;
+			inst_data_wb <=0;
+			DatatoReg_wb <=0;
 
 		end
 		else if(wb_en) begin
 			RegWrite_wb <= RegWrite_mem;
-			Reg_data_wb <= wt_data;
+		
 			Reg_addr_wb <= Reg_addr_mem; 
-		end
+			Mem_data <= Data_in;
+			ALU_out_wb <=ALU_out_mem;
+			pc_4_wb <= pc_4_mem;
+			inst_data_wb <= inst_data_mem;
+			DatatoReg_wb <= DatatoReg_mem;
+		end		
 	end
+	mux4to1_32  RegWriteDataChoose (.a(ALU_out_wb[31:0]), 
+						  .b(Mem_data[31:0]), 
+						  .c({inst_data_wb[15:0], 16'b00000000_00000000}), 
+						  .d(pc_4_wb[31:0]), 
+						  .sel(DatatoReg_wb[1:0]), 
+						  .o(Reg_data_wb[31:0]));
+
 	
 
 endmodule

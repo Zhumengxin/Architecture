@@ -68,7 +68,7 @@ module SCPU_control(
 			6'b100011: begin `CPU_ctrl_signals <= 16'b0_1_01_1_1_0_00_0_010_0_11; end // load
 			6'b101011: begin `CPU_ctrl_signals <= 16'bx_1_xx_0_0_1_00_0_010_0_11; end // store
 			6'b000100: begin `CPU_ctrl_signals <= {8'bx_0_xx_0_0_0_0, ~zero, 5'b0_110_0,10}; end // beq   //not sure for lock
-			6'b000010: begin `CPU_ctrl_signals <= 16'bx_x_xx_0_0_0_10_0_xxx_0_00; end // jump    //not sure
+			6'b000010: begin `CPU_ctrl_signals <= 16'bx_x_xx_0_0_0_10_1_xxx_0_00; end // jump    //not sure
 			6'h24: begin `CPU_ctrl_signals <= 16'b0_1_00_1_0_0_00_0_111_0_11; end // slti
 			6'h08: begin `CPU_ctrl_signals <= 16'b0_1_00_1_0_0_00_0_010_0_11; end // addi
 			6'h0C: begin `CPU_ctrl_signals <= 16'b0_1_00_1_0_0_00_0_000_0_11; end // andi
@@ -86,8 +86,8 @@ module SCPU_control(
 				6'b100111: begin `CPU_ctrl_signals <= 16'b1_0_00_1_0_0_00_0_100_0_11; end // nor
 				6'b000010: begin `CPU_ctrl_signals <= 16'b1_0_00_1_0_0_00_0_101_1_11; end // srl
 				6'b010110: begin `CPU_ctrl_signals <= 16'b1_0_00_1_0_0_00_0_011_0_11; end // xor
-				6'h8: begin `CPU_ctrl_signals <= 16'bx_x_xx_0_0_0_11_0_xxx_0_10; end // jr
-				6'h9: begin `CPU_ctrl_signals <= 16'b0_1_11_1_0_0_11_0_xxx_0_10; end // Jalr
+				6'h8: begin `CPU_ctrl_signals <= 16'bx_x_xx_0_0_0_11_1_xxx_0_10; end // jr
+				6'h9: begin `CPU_ctrl_signals <= 16'b0_1_11_1_0_0_11_1_xxx_0_10; end // Jalr
 				default: begin `CPU_ctrl_signals <= 16'b0; end
 			endcase end
 			default: begin `CPU_ctrl_signals <= 16'b0; end
@@ -133,9 +133,9 @@ module SCPU_control(
 		end
 		`endif
 		else if (reg_stall) begin
-		     if_en=0;
-			  id_en=0;
-			  exe_rst=1;
+		    // if_en=0;
+			 // id_en=0;
+			  //xe_rst=1;
 	   end
 	end
 

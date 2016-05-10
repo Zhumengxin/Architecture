@@ -42,13 +42,13 @@ module mips(
 	 
 	 
 	 Inst_ROM Inst_ROM (
-		.clka(clk),
+		.clka(~clk),
 		.addra({2'b0, inst_addr[31:2]}),
 		.douta(inst_data)
 		);
 		
 	 Data_RAM Data_RAM (
-		.clka(clk),
+		.clka(~clk),
 		.wea(mem_data_write_en),
 		.addra({2'b0, mem_data_addr[31:2]}),
 		//.addr(mem_addr),
