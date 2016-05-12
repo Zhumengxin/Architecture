@@ -47,12 +47,12 @@ module SCPU(// debug
 	 wire Jal;
 	 wire RegWrite;
 	 wire [1:0] DatatoReg;
-	 wire [1:0] Branch;
+	 wire [1:0] Branch,Branch2;
 	 wire [2:0] ALU_Control;
 	 wire zero;
 	 //new for lab2
 	 wire rs_lock,rt_lock;
-	 wire reg_stall;
+	 wire stall,branch_stall;
 	 wire if_rst, if_en;
 	 wire id_rst, id_en;
 	 wire exe_rst, exe_en;
@@ -60,6 +60,7 @@ module SCPU(// debug
 	 wire wb_rst, wb_en;
 	 wire [31:0] inst_data_control;
 	 
+	 wire [31:0] inst_data_exe,inst_data_mem,inst_data_wb;
 	 
 	 //assign mem_wen=mem_w;
 	 
@@ -70,9 +71,14 @@ module SCPU(// debug
 		.debug_en(debug_en),
 		.debug_step(debug_step),
 		`endif
-		.OPcode(inst_data_control[31:26]),
-	    .Fun(inst_data_control[5:0]),
-		.zero(zero),
+		//.OPcode(inst_data_control[31:26]),
+		//.Fun(inst_data_control[5:0]),
+	    .inst(inst_data_control),   //id inst
+	    .if_inst(inst_data),  //if inst
+		.exe_inst(inst_data_exe),
+		.mem_inst(inst_data_mem),
+		.wb_inst(inst_data_wb),
+		//.zero(zero),
 		.RegDst(RegDst),
 		.DatatoReg(DatatoReg),
 		.ALUSrc_B(ALUSrc_B),
@@ -82,8 +88,9 @@ module SCPU(// debug
 		.Memread(mem_r_controller),
 		.Memwrite(mem_w_controller),
 		.Branch(Branch),
+		.Branch2(Branch2),
 		.ALU_Control(ALU_Control),
-		.reg_stall(reg_stall),
+		//.reg_stall(reg_stall),
 		.rs_lock(rs_lock),
 		.rt_lock(rt_lock),
 		.if_rst(if_rst),
@@ -99,18 +106,26 @@ module SCPU(// debug
 		.mem_en(mem_en),
 		
 		.wb_rst(wb_rst),
-		.wb_en(wb_en)
+		.wb_en(wb_en),
+
+		.stall(stall),
+		.branch_stall(branch_stall)
 		
 	 );
 	 
 	 Data_path Data_path(
 		.clk(clk),
+		.rst(rst),
 		`ifdef DEBUG
 		.debug_addr(debug_addr[5:0]),
 		.debug_data(debug_data),
 		`endif
-		.inst_data(inst_data[31:0]),
-		.inst_data_id(inst_data_control[31:0]),
+		.inst_data(inst_data[31:0]),//inst from memory
+		.inst_data_id(inst_data_control[31:0]),  //inst trans to controller
+		
+		.inst_data_mem(inst_data_mem), // assist for stall detect ,trans to controller
+	    .inst_data_exe(inst_data_exe),
+	    .inst_data_wb(inst_data_wb),
 		.RegDst(RegDst),
 		.RegWrite(RegWrite),
 		.DatatoReg(DatatoReg),
@@ -119,9 +134,13 @@ module SCPU(// debug
 		.ALU_Control(ALU_Control),
 		.Jal(Jal),
 		.Branch(Branch),
-		.reg_stall(reg_stall),
-		.rs_lock(rs_lock),
-		.rt_lock(rt_lock),
+		.Branch2(Branch2),
+		.data_stall(stall),
+		.branch_stall(branch_stall),
+
+
+		//.rs_lock(rs_lock),
+		//.rt_lock(rt_lock),
 		.if_rst(if_rst),
 		.if_en(if_en),
 		.id_rst(id_rst),
