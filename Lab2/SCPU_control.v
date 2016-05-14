@@ -33,6 +33,7 @@ module SCPU_control(
 	input [31:0] exe_inst,
 	input [31:0] mem_inst,
 	input [31:0] wb_inst,
+	input [1:0] Branch_mem,
 	//input zero,
 	output reg ALUSrc_B,
 	output reg ALUSrc_A,
@@ -122,7 +123,7 @@ module SCPU_control(
 	assign id_branch = (OPcode == 6'b000100) || (OPcode == 6'b000010) || (OPcode == 6'h03) || (OPcode == 6'h05) || (OPcode == 6'h8) || (OPcode == 6'h9);
 	assign exe_branch = (exe_OPcode == 6'b000100) || (exe_OPcode == 6'b000010) || (exe_OPcode == 6'h03) || (exe_OPcode == 6'h05) || (exe_OPcode == 6'h8) || (exe_OPcode == 6'h9);
 	assign mem_branch = (mem_OPcode == 6'b000100) || (mem_OPcode == 6'b000010) || (mem_OPcode == 6'h03) || (mem_OPcode == 6'h05) || (mem_OPcode == 6'h8) || (mem_OPcode == 6'h9);
-	assign branch_stall = id_branch ||exe_branch || mem_branch;
+	assign branch_stall = id_branch ||exe_branch ;//|| mem_branch;
 
 	always @ (OPcode or Fun) begin
 		case(OPcode)
@@ -209,14 +210,25 @@ module SCPU_control(
 		     if_en=0;
 			 id_rst=1;
 			 
-	   end
-	   else if(branch_stall) begin
+	   	end
+	    //else if(exe_branch) begin
+	     		//if_rst=1;
+	    // 		if_en=1;
+	     		//id_en=1;
+
+	     //end
+	   	else if(branch_stall) begin
 	   		if_en=0;
 	   		id_rst=1;
 	   		//id_rst=1;
 	   		//id_en=0;
-
 	   end
+	    // if(Branch_mem != 2'b00) begin
+	    // 		if_rst = 1;
+	    // 		//if_en = 1;
+	    // end
+
+
 	end
 
 

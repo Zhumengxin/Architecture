@@ -24,6 +24,7 @@ module Data_path(
 		output reg[31:0]  inst_data_exe,
 		output reg[31:0]  inst_data_wb,
 		output zero,
+		output reg [1:0] Branch_mem,
 
 		//signal from controller
 		input  [2:0] ALU_Control,
@@ -87,7 +88,7 @@ module Data_path(
 	//all signal,others in parameter table
 	reg[2:0] ALU_Control_exe;
 	reg ALUSrc_A_exe,ALUSrc_B_exe;
-	reg[1:0] Branch_exe,Branch_mem,Branch2_exe;
+	reg[1:0] Branch_exe,Branch2_exe;
 	wire[1:0] finalBranch;
 	reg Jal_exe,Jal_mem;
 	reg RegDst_exe,RegDst_mem;
@@ -136,7 +137,7 @@ module Data_path(
 			28: debug_data_signal <= {20'b0,3'b0,zero,3'b0,data_stall,3'b0,branch_stall};
 			29:	debug_data_signal <= finalBranch;
 			30:debug_data_signal  <= branch_pc_mem[31:0];
-			31: debug_data_signal <= pc_next;
+			31: debug_data_signal <= PC_out;
 			default: debug_data_signal <= 32'hFFFF_FFFF;
 		endcase
 	end
@@ -169,10 +170,11 @@ module Data_path(
 			inst_ren <= 0;
 			inst_addr <= 0;
 		end
-		else if (branch_stall)begin
-			inst_ren <= 0;
-			inst_addr <= inst_addr;
-		end
+		
+		//else if (branch_stall)begin
+	//		inst_ren <= 0;
+	//		inst_addr <= PC_out;
+	//	end
 		else if (if_en) begin
 			inst_ren <= 1;
 			//inst_addr <= is_branch_mem ? alu_out_mem[15:0]<<2 : inst_addr_next; //?
@@ -205,10 +207,17 @@ module Data_path(
 			//inst_addr_next_id <= 0;
 		end
 		else if (id_en) begin
-			inst_addr_id <= inst_addr;
-			inst_data_id <= inst_data;
-			pc_4_id<=pc_4_if_wire;
-			//inst_addr_next_id <= inst_addr_next;
+			if(Branch_mem == 2'b00) begin
+				inst_addr_id <= inst_addr;
+				inst_data_id <= inst_data;
+				pc_4_id <= pc_4_if_wire;
+			end
+			else begin
+				inst_addr_id <= 0;
+				inst_data_id <= 0;
+				pc_4_id<= 0;
+			end
+			// //inst_addr_next_id <= inst_addr_next;
 		end
 	end
 	assign

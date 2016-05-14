@@ -61,7 +61,7 @@ module SCPU(// debug
 	 wire [31:0] inst_data_control;
 	 
 	 wire [31:0] inst_data_exe,inst_data_mem,inst_data_wb;
-	 
+	 wire [1:0] Branch_mem;
 	 //assign mem_wen=mem_w;
 	 
 	 SCPU_control SCPU_control(
@@ -89,6 +89,7 @@ module SCPU(// debug
 		.Memwrite(mem_w_controller),
 		.Branch(Branch),
 		.Branch2(Branch2),
+		.Branch_mem(Branch_mem),
 		.ALU_Control(ALU_Control),
 		//.reg_stall(reg_stall),
 		.rs_lock(rs_lock),

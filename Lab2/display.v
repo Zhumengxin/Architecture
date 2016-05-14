@@ -72,7 +72,9 @@ module display (
 				26: strdata[127:72] <= "MEMSIGN";
 				27: strdata[127:72] <= "WB-MEM-";
 				28: strdata[127:72] <= "-STALL-";
-				29: strdata[127:72] <= "J-ADDR-";
+				29: strdata[127:72] <= "SIGN-BR";
+				30: strdata[127:72] <= "ADDR-BR";
+				31: strdata[127:72] <= "PC--OUT";
 				default: strdata[127:72] <= "RESERVE";
 			endcase
 			3'b010: strdata[127:72] <= {"CP0S-", num2str(addr[5:4]), num2str(addr[3:0])};
