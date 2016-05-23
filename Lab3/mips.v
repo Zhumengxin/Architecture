@@ -24,7 +24,7 @@ module mips(
 		input wire debug_en,
 		input wire debug_step,
 		input wire [6:0] debug_addr,
-		output wire [128:0] debug_data,
+		output wire [31:0] debug_data,
 	   `endif
 		input wire clk,
 		input wire rst,

@@ -78,7 +78,7 @@ module mips_top (
 	
 	// display
 	reg [4:0] disp_addr0, disp_addr1, disp_addr2, disp_addr3;
-	wire [255:0] disp_data;
+	wire [31:0] disp_data;
 	
 	reg disp_prev_buf, disp_next_buf;
 	always @(posedge clk_cpu) begin

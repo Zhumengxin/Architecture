@@ -56,7 +56,7 @@ module SCPU_control(
 			6'b101011: begin `CPU_ctrl_signals <= 14'bx_1_xx_0_0_1_00_0_010_0; end // store
 			6'b000100: begin `CPU_ctrl_signals <= {8'bx_0_xx_0_0_0_0, ~zero, 5'b0_110_0}; end // beq
 			6'b000010: begin `CPU_ctrl_signals <= 14'bx_x_xx_0_0_0_10_0_xxx_0; end // jump
-			6'h24: begin `CPU_ctrl_signals <= 14'b0_1_00_1_0_0_00_0_111_0; end // slti
+			6'h0A: begin `CPU_ctrl_signals <= 14'b0_1_00_1_0_0_00_0_111_0; end // slti
 			6'h08: begin `CPU_ctrl_signals <= 14'b0_1_00_1_0_0_00_0_010_0; end // addi
 			6'h0C: begin `CPU_ctrl_signals <= 14'b0_1_00_1_0_0_00_0_000_0; end // andi
 			6'h0D: begin `CPU_ctrl_signals <= 14'b0_1_00_1_0_0_00_0_001_0; end // ori

@@ -65,7 +65,9 @@ module SCPU_control(
 	output reg wb_en,
 
 	output wire stall,
-	output wire branch_stall
+	output wire branch_stall,
+	output wire [1:0] ForwardA,
+	output wire [1:0] ForwardB
 	
     );
 	`define CPU_ctrl_signals {RegDst, ALUSrc_B, DatatoReg, RegWrite, Memread, Memwrite, Branch, Jal, ALU_Control,ALUSrc_A,Branch2}
@@ -131,7 +133,7 @@ module SCPU_control(
 			6'b101011: begin `CPU_ctrl_signals <= 16'bx_1_xx_0_0_1_00_0_010_0_00; end // store
 			6'b000100: begin `CPU_ctrl_signals <= 16'bx_0_xx_0_0_0_00_0_110_0_10; end // beq   //not sure for lock
 			6'b000010: begin `CPU_ctrl_signals <= 16'bx_x_xx_0_0_0_10_0_xxx_0_00; end // jump    //not sure
-			6'h0A: begin `CPU_ctrl_signals <= 16'b0_1_00_1_0_0_00_0_111_0_00; end // slti
+			6'h24: begin `CPU_ctrl_signals <= 16'b0_1_00_1_0_0_00_0_111_0_00; end // slti
 			6'h08: begin `CPU_ctrl_signals <= 16'b0_1_00_1_0_0_00_0_010_0_00; end // addi
 			6'h0C: begin `CPU_ctrl_signals <= 16'b0_1_00_1_0_0_00_0_000_0_00; end // andi
 			6'h0D: begin `CPU_ctrl_signals <= 16'b0_1_00_1_0_0_00_0_001_0_00; end // ori
@@ -160,14 +162,23 @@ module SCPU_control(
 	//stall detect
 	assign AfromEx = (if_rs==rd) & (if_rs != 0) & (OPcode ==6'b000000);
 	assign BfromEx = (if_rt==rd) & (if_rt != 0) & (OPcode == 6'b000000);
-	assign AfromMem = (if_rs==exe_rd) & (if_rs!=0) & (exe_OPcode == 6'b000000);
-	assign BfromMem = (if_rt==exe_rd) & (if_rt!=0) & (exe_OPcode == 6'b000000);
+	assign AfromMem = ((if_rs==exe_rd) & (if_rs!=0) & (exe_OPcode == 6'b000000)) || ((if_rs==exe_rt) & (if_rs!=0) & (exe_OPcode == 6'b100011) );
+	assign BfromMem = ((if_rt==exe_rd) & (if_rt!=0) & (exe_OPcode == 6'b000000)) || ((if_rt==exe_rt) & (if_rt!=0) & (exe_OPcode == 6'b100011) );
 	assign AfromExLW = (if_rs==rt) & (if_rs!=0) & (OPcode == 6'b100011);
 	assign BfromExLW = (if_rt==rt) & (if_rt!=0) & (OPcode == 6'b100011);
-	assign AfromMemLW = (if_rs==exe_rt) & (if_rs!=0) & (exe_OPcode == 6'b100011);
-	assign BfromMemLW = (if_rt==exe_rt) & (if_rt!=0) & (exe_OPcode == 6'b100011);
+	//assign AfromMemLW = (if_rs==exe_rt) & (if_rs!=0) & (exe_OPcode == 6'b100011);
+	//assign BfromMemLW = (if_rt==exe_rt) & (if_rt!=0) & (exe_OPcode == 6'b100011);
 	
-	assign stall = AfromEx || BfromEx || AfromMem || BfromMem || AfromExLW || BfromExLW || AfromMemLW || BfromMemLW;
+	assign ForwardA[1:0] = (AfromEx == 1?)2'b01:((AfromMem == 1?)2'b10:2'b00); 
+	assign ForwardB[1:0] = (BfromEx == 1?)2'b01:((BfromMem == 1?)2'b10:2'b00); 
+
+	//assign stall = AfromEx || BfromEx || AfromMem || BfromMem || AfromExLW || BfromExLW || AfromMemLW || BfromMemLW;
+	assign stall = AfromExLW ||BfromExLW;
+	// forward judge
+
+
+
+
 
 	// debug control
 	`ifdef DEBUG

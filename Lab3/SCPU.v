@@ -27,7 +27,7 @@ module SCPU(// debug
 	input wire debug_en,  // debug enable
 	input wire debug_step,  // debug step clock
 	input wire [6:0] debug_addr,  // debug address
-	output wire [128:0] debug_data,  // debug data
+	output wire [31:0] debug_data,  // debug data
 	`endif
 	// instruction interfaces
 	output wire inst_ren,  // instruction read enable signal
@@ -61,7 +61,7 @@ module SCPU(// debug
 	 wire [31:0] inst_data_control;
 	 
 	 wire [31:0] inst_data_exe,inst_data_mem,inst_data_wb;
-	 wire [1:0] Branch_mem;
+	 wire [1:0] Branch_mem, ForwardA, ForwardB;
 	 //assign mem_wen=mem_w;
 	 
 	 SCPU_control SCPU_control(
@@ -110,7 +110,9 @@ module SCPU(// debug
 		.wb_en(wb_en),
 
 		.stall(stall),
-		.branch_stall(branch_stall)
+		.branch_stall(branch_stall),
+		.ForwardA(ForwardA),
+		.ForwardB(ForwardB)
 		
 	 );
 	 
@@ -162,7 +164,9 @@ module SCPU(// debug
 		.ALU_out(mem_addr),
 		.Data_out(mem_dout),
 		.inst_addr(inst_addr),
-		.zero(zero)
+		.zero(zero),
+		.ForwardA(ForwardA),
+		.ForwardB(ForwardB)
 	 );
 
 endmodule

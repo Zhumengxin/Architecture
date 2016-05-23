@@ -55,10 +55,13 @@ Lab1/ipcore_dir/ROM/example_design/
 Lab1/ipcore_dir/ROM/example_design/ROM_exdes.ucf
 Lab2/ipcore_dir/ROM/
 Lab2/ipcore_dir/ROM/example_design/
+Lab3/ipcore_dir/ROM/
+Lab3/ipcore_dir/ROM/example_design/
 */isim/
 *.xdc
 Lab1/xst/
 Lab2/xst
+Lab3/xst
 *.xise
 
 *.veo
