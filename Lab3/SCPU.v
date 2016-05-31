@@ -27,7 +27,7 @@ module SCPU(// debug
 	input wire debug_en,  // debug enable
 	input wire debug_step,  // debug step clock
 	input wire [6:0] debug_addr,  // debug address
-	output wire [128:0] debug_data,  // debug data
+	output wire [127:0] debug_data,  // debug data
 	`endif
 	// instruction interfaces
 	output wire inst_ren,  // instruction read enable signal

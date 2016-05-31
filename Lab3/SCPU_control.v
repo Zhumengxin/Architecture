@@ -170,8 +170,10 @@ module SCPU_control(
 	assign BfromEx = ((rt==exe_rd) & (rt != 0) & (exe_OPcode == 6'b000000)) || ((rt==exe_rt) & (rt != 0) & (i_type_exe==1));
 	assign AfromMem = ((rs==mem_rd) & (rs!= 0) & (mem_OPcode == 6'b000000)) ||  ((rs==mem_rt) & (rs != 0) & (i_type_mem==1));
 	assign BfromMem = ((rt==mem_rd) & (rt!= 0) & (mem_OPcode == 6'b000000)) ||  ((rt==mem_rt) & (rt != 0) & (i_type_mem==1));
+	
 	assign AfromDM = ((rs==mem_rt) & (rs!=0) & (mem_OPcode == 6'b100011));
 	assign BfromDM = ((rt==mem_rt) & (rt!=0) & (mem_OPcode == 6'b100011));
+	
 	assign AfromExLW = (if_rs==rt) & (if_rs!=0) & (OPcode == 6'b100011);
 	assign BfromExLW = (if_rt==rt) & (if_rt!=0) & (OPcode == 6'b100011) & (if_OPcode != 6'b101011 & if_OPcode != 6'b100011) & (i_type_if!=1);
 	

@@ -99,7 +99,7 @@ module SCPU_control(
 	assign rs[4:0] = inst[25:21];
 	assign rt[4:0] = inst[20:16];
 	assign rd[4:0] = inst[15:11];
-
+	assign i_type = (OPcode > 6'h07 && OPcode <6'h10)?1:0;
 
 	assign if_OPcode[5:0] =if_inst[31:26];
 	assign if_rs[4:0] = if_inst[25:21];
@@ -123,8 +123,8 @@ module SCPU_control(
 	assign wb_rt[4:0] = wb_inst[20:16];
 	assign wb_OPcode[5:0] = wb_inst[31:26];
 
-	assign id_branch = (OPcode == 6'b000100) || (OPcode == 6'b000010) || (OPcode == 6'h03) || (OPcode == 6'h05) || (OPcode == 6'h8) || (OPcode == 6'h9);
-	assign exe_branch = (exe_OPcode == 6'b000100) || (exe_OPcode == 6'b000010) || (exe_OPcode == 6'h03) || (exe_OPcode == 6'h05) || (exe_OPcode == 6'h8) || (exe_OPcode == 6'h9);
+	assign id_branch = ((OPcode > 6'h00) &  (OPcode < 6'h08)) || ((OPcode == 6'h0) & (Fun == 6'h08)) || ((OPcode == 6'h0) & (Fun == 6'h09));
+	assign exe_branch = ((exe_OPcode > 6'h00) &  (exe_OPcode < 6'h08)) || ((exe_OPcode == 6'h0) & (exe_inst[5:0] == 6'h08)) || ((exe_OPcode == 6'h0) & (exe_inst[5:0] == 6'h09));
 	assign mem_branch = (mem_OPcode == 6'b000100) || (mem_OPcode == 6'b000010) || (mem_OPcode == 6'h03) || (mem_OPcode == 6'h05) || (mem_OPcode == 6'h8) || (mem_OPcode == 6'h9);
 	assign branch_stall = id_branch ||exe_branch ;//|| mem_branch;
 
@@ -159,19 +159,29 @@ module SCPU_control(
 		endcase
 	end
 	
-
+	wire AfromEx , BfromEx , AfromMem , BfromMem , AfromExLW , BfromExLW , AfromMemLW , BfromMemLW;
 	//stall detect
-	assign AfromEx = (if_rs==rd) & (if_rs != 0) & (OPcode ==6'b000000);
-	assign BfromEx = (if_rt==rd) & (if_rt != 0) & (OPcode == 6'b000000)  & (i_type_if==0) ;
-	assign AfromMem = (if_rs==exe_rd) & (if_rs!=0) & (exe_OPcode == 6'b000000);
-	assign BfromMem = (if_rt==exe_rd) & (if_rt!=0) & (exe_OPcode == 6'b000000)  & (i_type_if==0);
-	assign AfromExLW = (if_rs==rt) & (if_rs!=0) & (OPcode == 6'b100011) ;
+	
+	assign AfromEx = ((if_rs==rd) & (if_rs != 0) & (OPcode ==6'b000000)) || ((if_rs==rt) & (if_rs != 0) & (i_type==1));
+	assign BfromEx = ((if_rt==rd) & (if_rt != 0) & (OPcode == 6'b000000) & (i_type_if==0)) || ((if_rt==rt) & (if_rt != 0) & (i_type==1) & (i_type_if==0));
+	assign AfromMem = ((if_rs==exe_rd) & (if_rs!=0) & (exe_OPcode == 6'b000000)) || ((if_rs==exe_rt) & (if_rs != 0) & (i_type_exe==1));
+	assign BfromMem = ((if_rt==exe_rd) & (if_rt!=0) & (exe_OPcode == 6'b000000) & (i_type_if==0) ) ||((if_rt==exe_rt) & (if_rt != 0) & (i_type_exe==1) & (i_type_if==0));
+	assign AfromExLW = (if_rs==rt) & (if_rs!=0) & (OPcode == 6'b100011);
 	assign BfromExLW = (if_rt==rt) & (if_rt!=0) & (OPcode == 6'b100011) & (i_type_if==0);
 	assign AfromMemLW = (if_rs==exe_rt) & (if_rs!=0) & (exe_OPcode == 6'b100011) ;
 	assign BfromMemLW = (if_rt==exe_rt) & (if_rt!=0) & (exe_OPcode == 6'b100011)& (i_type_if==0);
-	
 	assign stall = AfromEx || BfromEx || AfromMem || BfromMem || AfromExLW || BfromExLW || AfromMemLW || BfromMemLW;
-
+	/*
+	assign AfromEx = (if_rs==rd) & (if_rs != 0) & (OPcode ==6'b000000);
+	assign BfromEx = (if_rt==rd) & (if_rt != 0) & (OPcode == 6'b000000);
+	assign AfromMem = (if_rs==exe_rd) & (if_rs!=0) & (exe_OPcode == 6'b000000);
+	assign BfromMem = (if_rt==exe_rd) & (if_rt!=0) & (exe_OPcode == 6'b000000);
+	assign AfromExLW = (if_rs==rt) & (if_rs!=0) & (OPcode == 6'b100011);
+	assign BfromExLW = (if_rt==rt) & (if_rt!=0) & (OPcode == 6'b100011);
+	assign AfromMemLW = (if_rs==exe_rt) & (if_rs!=0) & (exe_OPcode == 6'b100011);
+	assign BfromMemLW = (if_rt==exe_rt) & (if_rt!=0) & (exe_OPcode == 6'b100011);
+	assign stall = AfromEx || BfromEx || AfromMem || BfromMem || AfromExLW || BfromExLW || AfromMemLW || BfromMemLW;
+*/
 	// debug control
 	`ifdef DEBUG
 	reg debug_step_prev;
@@ -220,7 +230,7 @@ module SCPU_control(
 	     		//id_en=1;
 
 	     //end
-	   	else if(branch_stall) begin
+	   else if(branch_stall) begin
 	   		if_en=0;
 	   		id_rst=1;
 	   		//id_rst=1;

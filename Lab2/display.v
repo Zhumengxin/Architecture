@@ -19,6 +19,7 @@ module display (
 	
 	reg [255:0] strdata ;//= "* Hello World! ** Hello World! *";
 	reg [63:0] data_value;
+	reg [63:0] reg_value;
 	function [7:0] num2str;
 		input [3:0] number;
 		begin
@@ -32,12 +33,12 @@ module display (
 	genvar i;
 	generate for (i=0; i<8; i=i+1) begin: NUM2STR
 		always @(posedge clk) begin
-			strdata[8*i+199-:8] <= num2str(data[4*i+99-:4]);
+			//strdata[8*i+199-:8] <= num2str(data[4*i+99-:4]);
+			reg_value[8*i+7-:8] <= num2str(data[4*i+59-:4]);
 			data_value[8*i+7-:8] <= num2str(data[4*i+3-:4]);
 		end
 	end
 	endgenerate
-	
 	//
 
 	
@@ -90,7 +91,12 @@ module display (
 				strdata[71:0] <= data_value;
 			end
 			3'b010: strdata[127:72] <= {"CP0S-", num2str(addr[5:4]), num2str(addr[3:0])};
-			3'b011: strdata[127:8] <= {"F",num2str(data[95:92]),num2str(data[91:88]),"D",num2str(data[87:84]),num2str(data[83:80]),"E",num2str(data[79:76]),num2str(data[75:72]),"M",num2str(data[71:68]),num2str(data[67:64]),"W",num2str(data[63:60]),num2str(data[59:56])};
+			3'b011: 
+			begin
+				strdata[255:136] <= {"F",num2str(data[127:124]),num2str(data[123:120]),"D",num2str(data[119:116]),num2str(data[115:112]),"E",num2str(data[111:108]),num2str(data[107:104]),"M",num2str(data[103:100]),num2str(data[99:96]),"W",num2str(data[95:92]),num2str(data[91:88])};
+				strdata[127:72] <= {"REGS-", num2str(addr[5:4]-2), num2str(addr[3:0])};
+				strdata[71:0] <= reg_value;
+			end
 		endcase
 	end
 	

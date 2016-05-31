@@ -11,7 +11,7 @@ module Data_path(
 		// debug
 		`ifdef DEBUG
 		input wire [5:0] debug_addr,  // debug address
-		output wire [128:0] debug_data,  // debug data
+		output wire [127:0] debug_data,  // debug data
 		`endif
 		input [31:0] inst_data,
 		input [31:0] Data_in,
@@ -104,6 +104,7 @@ module Data_path(
 	reg inst_ren;
 
 	wire [31:0] data_rs_final,data_rt_final;
+	wire [31:0] display_inst_data;
 	wire [31:0] memout;
 	reg [31:0] memout_mem;
 	reg ForwardM_exe;
@@ -111,50 +112,54 @@ module Data_path(
 	// debug
 	`ifdef DEBUG
 	wire [31:0] debug_data_reg;
-	reg [31:0] debug_data_signal;
+	reg [127:0] debug_data_signal;
 	
 	always @(posedge clk) begin
 		case (debug_addr[4:0])
-			0: debug_data_signal <= inst_addr;
-			1: debug_data_signal <= inst_data;
-			2: debug_data_signal <= inst_addr_id;
-			3: debug_data_signal <= inst_data_id;
-			4: debug_data_signal <= inst_addr_exe;
-			5: debug_data_signal <= inst_data_exe;
-			6: debug_data_signal <= inst_addr_mem;
-			7: debug_data_signal <= inst_data_mem;
-			8: debug_data_signal <= {27'b0, addr_rs_id};
-			9: debug_data_signal <= data_rs_id;
-			10: debug_data_signal <= {27'b0, addr_rt_id};
-			11: debug_data_signal <= data_rt_id;
-			12: debug_data_signal <= Imm_32_exe;//data_imm;
-			13: debug_data_signal <= ALU_A;
-			14: debug_data_signal <= ALU_B;
-			15: debug_data_signal <= ALU_out_DUMMY;
-			16: debug_data_signal <= {27'b0,wt_addr_2[4:0]};
-			17: debug_data_signal <= Branch_mem;
-			18: debug_data_signal <= Branch2_exe;//mem_wen};
-			19: debug_data_signal <= ALU_out;
-			20: debug_data_signal <= Data_in;
-			21: debug_data_signal <= Data_out;
-			22: debug_data_signal <= {27'b0, Reg_addr_wb[4:0]};
-			23: debug_data_signal <= Reg_data_wb;
-			24: debug_data_signal <= {13'b0,ALU_Control[2:0],  mem_r_control,mem_w_control,ALUSrc_A, ALUSrc_B,    0,Jal,Branch,   RegWrite,RegDst,DatatoReg,0,0,Branch2};
-			25: debug_data_signal <= {13'b0,ALU_Control_exe[2:0],  mem_r_exe,mem_w_exe,ALUSrc_A_exe, ALUSrc_B_exe,    0,Jal_exe,Branch_exe,   RegWrite_exe,RegDst_exe,DatatoReg_exe,finalBranch};
-			26: debug_data_signal <= {4'b0,  mem_r_mem,mem_w_mem,2'b0,    0,Jal_mem,Branch_mem,   RegWrite_mem,RegDst_mem,DatatoReg_mem,0,0,Branch_mem};
-			27: debug_data_signal <= Mem_data;
-			28: debug_data_signal <= {20'b0,3'b0,zero,3'b0,data_stall,3'b0,branch_stall};
-			29:	debug_data_signal <= finalBranch;
-			30:debug_data_signal  <= branch_pc_mem[31:0];
-			31: debug_data_signal <= PC_out;
-			default: debug_data_signal <= 32'hFFFF_FFFF;
+			0: debug_data_signal[31:0] <= inst_addr;
+			1: debug_data_signal[31:0] <= display_inst_data;
+			2: debug_data_signal[31:0] <= inst_addr_id;
+			3: debug_data_signal[31:0] <= inst_data_id;
+			4: debug_data_signal[31:0] <= inst_addr_exe;
+			5: debug_data_signal[31:0] <= inst_data_exe;
+			6: debug_data_signal[31:0] <= inst_addr_mem;
+			7: debug_data_signal[31:0] <= inst_data_mem;
+			8: debug_data_signal[31:0] <= {27'b0, addr_rs_id};
+			9: debug_data_signal[31:0] <= data_rs_id;
+			10: debug_data_signal[31:0] <= {27'b0, addr_rt_id};
+			11: debug_data_signal[31:0] <= data_rt_id;
+			12: debug_data_signal[31:0] <= Imm_32_exe;//data_imm;
+			13: debug_data_signal[31:0] <= ALU_A;
+			14: debug_data_signal[31:0] <= ALU_B;
+			15: debug_data_signal[31:0] <= ALU_out_DUMMY;
+			16: debug_data_signal[31:0] <= {27'b0,wt_addr_2[4:0]};
+			17: debug_data_signal[31:0] <= Branch_mem;
+			18: debug_data_signal[31:0] <= Branch2_exe;//mem_wen};
+			19: debug_data_signal[31:0] <= ALU_out;
+			20: debug_data_signal[31:0] <= Data_in;
+			21: debug_data_signal[31:0] <= Data_out;
+			22: debug_data_signal[31:0] <= {27'b0, Reg_addr_wb[4:0]};
+			23: debug_data_signal[31:0] <= Reg_data_wb;
+			24: debug_data_signal[31:0] <= {13'b0,ALU_Control[2:0],  mem_r_control,mem_w_control,ALUSrc_A, ALUSrc_B,    0,Jal,Branch,   RegWrite,RegDst,DatatoReg,0,0,Branch2};
+			25: debug_data_signal[31:0] <= {13'b0,ALU_Control_exe[2:0],  mem_r_exe,mem_w_exe,ALUSrc_A_exe, ALUSrc_B_exe,    0,Jal_exe,Branch_exe,   RegWrite_exe,RegDst_exe,DatatoReg_exe,finalBranch};
+			26: debug_data_signal[31:0] <= {4'b0,  mem_r_mem,mem_w_mem,2'b0,    0,Jal_mem,Branch_mem,   RegWrite_mem,RegDst_mem,DatatoReg_mem,0,0,Branch_mem};
+			27: debug_data_signal[31:0] <= Mem_data;
+			28: debug_data_signal[31:0] <= {20'b0,3'b0,zero,3'b0,data_stall,3'b0,branch_stall};
+			29:	debug_data_signal[31:0] <= finalBranch;
+			30:debug_data_signal[31:0]  <= branch_pc_mem[31:0];
+			31: debug_data_signal[31:0] <= PC_out;
+			default: debug_data_signal[31:0] <= 32'hFFFF_FFFF;
 		endcase
+			//debug_data_signal[127:96] <= display_inst_data;
+			debug_data_signal[127:88] <={inst_addr[7:0],inst_addr_id[7:0],inst_addr_exe[7:0],inst_addr_mem[7:0],inst_addr_wb[7:0]};
 	end
 	
 	assign
-		debug_data[31:0] = debug_addr[5] ? debug_data_signal : debug_data_reg;
-	//assign 
-		//debug_data[127:96] = inst_data;
+		display_inst_data = inst_data;
+	assign
+		debug_data[31:0] = debug_addr[5] ? debug_data_signal[31:0] : debug_data_reg,
+		debug_data[127:88] = debug_data_signal[127:88],
+		debug_data[87:56] = debug_data_reg;
 	//assign 
 	//debug_data[95:56] = {inst_addr[7:0],inst_addr_id[7:0],inst_addr_exe[7:0],inst_addr_mem[7:0],inst_addr_wb[7:0]};
 	`endif
