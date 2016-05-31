@@ -11,7 +11,7 @@ module Data_path(
 		// debug
 		`ifdef DEBUG
 		input wire [5:0] debug_addr,  // debug address
-		output wire [31:0] debug_data,  // debug data
+		output wire [128:0] debug_data,  // debug data
 		`endif
 		input [31:0] inst_data,
 		input [31:0] Data_in,
@@ -60,7 +60,8 @@ module Data_path(
 		output overflow,   //no use temply
 
 		input wire[1:0] ForwardA,
-		input wire[1:0] ForwardB
+		input wire[1:0] ForwardB,
+		input wire ForwardM
 
 		
     );
@@ -68,7 +69,7 @@ module Data_path(
 	wire [31:0] pc_4_if_wire,pc_next;
 	wire[31:0] addr_rs_id,addr_rt_id,addr_rd_id;
 	wire[15:0] imm_16;
-	reg[31:0] inst_addr_id,inst_addr_exe,inst_addr_mem;
+	reg[31:0] inst_addr_id,inst_addr_exe,inst_addr_mem,inst_addr_wb;
 	//reg[31:0] inst_data_exe,inst_data_mem,inst_data_wb;
 	reg[31:0] Imm_32,Imm_32_exe;
 	wire[31:0] Imm_32_id;
@@ -103,6 +104,9 @@ module Data_path(
 	reg inst_ren;
 
 	wire [31:0] data_rs_final,data_rt_final;
+	wire [31:0] memout;
+	reg [31:0] memout_mem;
+	reg ForwardM_exe;
 	//*/
 	// debug
 	`ifdef DEBUG
@@ -148,7 +152,11 @@ module Data_path(
 	end
 	
 	assign
-		debug_data = debug_addr[5] ? debug_data_signal : debug_data_reg;
+		debug_data[31:0] = debug_addr[5] ? debug_data_signal : debug_data_reg;
+	//assign 
+		//debug_data[127:96] = inst_data;
+	//assign 
+	//debug_data[95:56] = {inst_addr[7:0],inst_addr_id[7:0],inst_addr_exe[7:0],inst_addr_mem[7:0],inst_addr_wb[7:0]};
 	`endif
 	
 
@@ -212,16 +220,16 @@ module Data_path(
 			//inst_addr_next_id <= 0;
 		end
 		else if (id_en) begin
-			if(Branch_mem == 2'b00) begin
+			//if(Branch_mem == 2'b00) begin
 				inst_addr_id <= inst_addr;
 				inst_data_id <= inst_data;
 				pc_4_id <= pc_4_if_wire;
-			end
-			else begin
-				inst_addr_id <= 0;
-				inst_data_id <= 0;
-				pc_4_id<= 0;
-			end
+			//end
+			// else begin
+			// 	inst_addr_id <= 0;
+			// 	inst_data_id <= 0;
+			// 	pc_4_id<= 0;
+			// end
 			// //inst_addr_next_id <= inst_addr_next;
 		end
 	end
@@ -292,6 +300,8 @@ module Data_path(
 				
 				mem_r_exe <= 0;
 				mem_w_exe <= 0;
+
+				//memout_exe <= 0;
 			
 		end
 		else if (exe_en) begin
@@ -315,6 +325,7 @@ module Data_path(
 				
 				mem_r_exe <= mem_r_control;
 				mem_w_exe <= mem_w_control;
+				ForwardM_exe <=ForwardM;
 		end
 		//	is_branch_exe <= is_branch_ctrl & (data_rs == data_rt);  // BEQ only
 	
@@ -365,6 +376,12 @@ module Data_path(
 							.d({Branch_exe[1],zero}),
 							.sel(Branch2_exe),
 							.o(finalBranch));
+
+
+	mux2to1_32  Data_Out_Choose (.a(Data_in[31:0]), 
+						  .b(data_rt_exe[31:0]), 
+						  .sel(ForwardM_exe), 
+						  .o(memout[31:0]));
 	
 	
 	//mem stage
@@ -391,6 +408,8 @@ module Data_path(
 			//wb_wen_mem <= 0;
 			//is_branch_mem <= 0;
 			branch_pc_mem <= 0;
+
+			memout_mem <= 0;
 		end
 		else if (mem_en) begin
 			//mem_valid <= exe_valid;
@@ -412,12 +431,16 @@ module Data_path(
 			DatatoReg_mem <=DatatoReg_exe;
 			Reg_addr_mem <= wt_addr_2;
 			branch_pc_mem <= branch_pc;
+
+			memout_mem <= memout;
 		end
 	end
+
+	
 	
 	assign 
 		ALU_out = ALU_out_mem,
-		Data_out = data_rt_mem,
+		Data_out = memout_mem,
 		mem_r = mem_r_mem,
 		mem_w = mem_w_mem & mem_en;
 
@@ -432,7 +455,7 @@ module Data_path(
 			pc_4_wb <= 0;
 			inst_data_wb <=0;
 			DatatoReg_wb <=0;
-
+			inst_addr_wb <= 0;
 		end
 		else if(wb_en) begin
 			Reg_addr_wb <= Reg_addr_mem; 
@@ -441,6 +464,7 @@ module Data_path(
 			pc_4_wb <= pc_4_mem;
 			inst_data_wb <= inst_data_mem;
 			DatatoReg_wb <= DatatoReg_mem;
+			inst_addr_wb <= inst_addr_mem;
 		end	
 		RegWrite_wb <= RegWrite_mem & wb_en;
 

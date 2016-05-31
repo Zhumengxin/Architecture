@@ -9,7 +9,7 @@ module display (
 	input wire clk,
 	input wire rst,
 	input wire [7:0] addr,
-	input wire [31:0] data,
+	input wire [128:0] data,
 	// character LCD interfaces
 	output wire lcd_e,
 	output wire lcd_rs,
@@ -17,7 +17,8 @@ module display (
 	output wire [3:0] lcd_dat
 	);
 	
-	reg [255:0] strdata = "* Hello World! ** Hello World! *";
+	reg [255:0] strdata ;//= "* Hello World! ** Hello World! *";
+	reg [63:0] data_value;
 	
 	function [7:0] num2str;
 		input [3:0] number;
@@ -32,16 +33,21 @@ module display (
 	genvar i;
 	generate for (i=0; i<8; i=i+1) begin: NUM2STR
 		always @(posedge clk) begin
-			strdata[8*i+7-:8] <= num2str(data[4*i+3-:4]);
+			strdata[8*i+199-:8] <= num2str(data[4*i+99-:4]);
+			data_value[8*i+7-:8] <= num2str(data[4*i+3-:4]);
 		end
 	end
 	endgenerate
 	
 	always @(posedge clk) begin
-		strdata[71:64] <= " ";
+		//strdata[71:64] <= " ";
 		case (addr[7:5])
-			3'b000: strdata[127:72] <= {"REGS-", num2str(addr[5:4]), num2str(addr[3:0])};
-			3'b001: case (addr[4:0])
+			3'b000: begin
+				strdata[127:72] <= {"REGS-", num2str(addr[5:4]), num2str(addr[3:0])};
+				strdata[71:0] <= data_value;
+				end
+			3'b001:begin
+				case (addr[4:0])
 				// datapath debug signals, MUST be compatible with 'debug_data_signal' in 'datapath.v'
 				0: strdata[127:72] <= "IF-ADDR";
 				1: strdata[127:72] <= "IF-INST";
@@ -77,9 +83,12 @@ module display (
 				31: strdata[127:72] <= "PC--OUT";
 				default: strdata[127:72] <= "RESERVE";
 			endcase
+				strdata[71:0] <= data_value;
+			end
 			3'b010: strdata[127:72] <= {"CP0S-", num2str(addr[5:4]), num2str(addr[3:0])};
-			default: strdata[127:72] <= "RESERVE";
+			3'b011: strdata[127:8] <= {"F",num2str(data[95:92]),num2str(data[91:88]),"D",num2str(data[87:84]),num2str(data[83:80]),"E",num2str(data[79:76]),num2str(data[75:72]),"M",num2str(data[71:68]),num2str(data[67:64]),"W",num2str(data[63:60]),num2str(data[59:56])};
 		endcase
+		
 	end
 	
 	reg refresh = 0;

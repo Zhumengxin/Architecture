@@ -1,6 +1,6 @@
 0	Lw r1, 20(r0)		;R1=4
 1	Lw r2, 24(r0)		;R2=1	
-2	Add r3,r2,r1    	;R3=5	//LW-ALU:forwarding:1 stall
+2	Add r3,r1,r2    	;R3=5	//LW-ALU:forwarding:1 stall
 3	Sub r4,r3,r1      	;R4=1	//ALU-ALU
 4	And r5,r3,r1     	;R5=4	//无冲突
 5	Or r6,r3,r1		;R6=5	//无冲突
@@ -21,7 +21,7 @@
 20	Sub r4,r3,r1		;R4=1
 21	Addi r20, r4, 1 	;R20=2	//ALU-addi
 22	Ori r20, r4, 1   	;R20=1	//无冲突
-23	Bne r1, r2, 4  		;taken
+23	Bne r1, r2, 1  		;taken
 24	Lw r1, (20)r0		;不执行 
 25	Lw r2, (24)r0		;R2=1
 26	Add r3,r2,r1		;R3=9

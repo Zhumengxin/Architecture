@@ -4,10 +4,10 @@
 // Company: 
 // Engineer:
 //
-// Create Date:   16:48:29 05/29/2016
+// Create Date:   22:25:38 05/24/2016
 // Design Name:   mips_top
-// Module Name:   Y:/Documents/ARCH/Lab3/mips_test.v
-// Project Name:  Lab3
+// Module Name:   Y:/Documents/ARCH/Lab2/test.v
+// Project Name:  Lab2
 // Target Device:  
 // Tool versions:  
 // Description: 
@@ -22,7 +22,7 @@
 // 
 ////////////////////////////////////////////////////////////////////////////////
 
-module mips_test;
+module test;
 
 	// Inputs
 	reg CCLK;
@@ -63,7 +63,7 @@ module mips_test;
 	initial begin
 		// Initialize Inputs
 		CCLK = 0;
-		SW = 0000;
+		SW = 0;
 		BTNN = 0;
 		BTNE = 0;
 		BTNS = 0;
@@ -79,8 +79,8 @@ module mips_test;
 		forever begin
 			CCLK = ~CCLK;
 			#10;
+			
 		end
-
 	end
       
 endmodule

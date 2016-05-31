@@ -69,7 +69,7 @@ module SCPU_control(
 	
     );
 	`define CPU_ctrl_signals {RegDst, ALUSrc_B, DatatoReg, RegWrite, Memread, Memwrite, Branch, Jal, ALU_Control,ALUSrc_A,Branch2}
-	
+	wire i_type_exe,i_type_mem,i_type_if;
 	wire [4:0] exe_rs;
 	wire [4:0] exe_rt;
 	wire [4:0] exe_rd;
@@ -105,16 +105,19 @@ module SCPU_control(
 	assign if_rs[4:0] = if_inst[25:21];
 	assign if_rt[4:0] = if_inst[20:16];
 	assign if_rd[4:0] = if_inst[15:11];
+	assign i_type_if = (if_OPcode > 6'h07 && if_OPcode <6'h10)?1:0;	
 	//assign if_func[5:0] = if_inst[5:0];
 
 	assign exe_OPcode[5:0] = exe_inst[31:26];
 	assign exe_rs[4:0] = exe_inst[25:21];
 	assign exe_rt[4:0] = exe_inst[20:16];
 	assign exe_rd[4:0] = exe_inst[15:11];
+	assign i_type_exe = (exe_OPcode > 6'h07 && exe_OPcode <6'h10)?1:0;
 	
 	assign mem_OPcode[5:0] = mem_inst[31:26];
 	assign mem_rt[4:0] = mem_inst[20:16];
 	assign mem_rd[4:0] = mem_inst[15:11];
+	assign i_type_mem = (mem_OPcode > 6'h07 && mem_OPcode <6'h10)?1:0;
 	
 	assign wb_rd[4:0] = wb_inst[15:11];
 	assign wb_rt[4:0] = wb_inst[20:16];
@@ -159,13 +162,13 @@ module SCPU_control(
 
 	//stall detect
 	assign AfromEx = (if_rs==rd) & (if_rs != 0) & (OPcode ==6'b000000);
-	assign BfromEx = (if_rt==rd) & (if_rt != 0) & (OPcode == 6'b000000);
+	assign BfromEx = (if_rt==rd) & (if_rt != 0) & (OPcode == 6'b000000)  & (i_type_if==0) ;
 	assign AfromMem = (if_rs==exe_rd) & (if_rs!=0) & (exe_OPcode == 6'b000000);
-	assign BfromMem = (if_rt==exe_rd) & (if_rt!=0) & (exe_OPcode == 6'b000000);
-	assign AfromExLW = (if_rs==rt) & (if_rs!=0) & (OPcode == 6'b100011);
-	assign BfromExLW = (if_rt==rt) & (if_rt!=0) & (OPcode == 6'b100011);
-	assign AfromMemLW = (if_rs==exe_rt) & (if_rs!=0) & (exe_OPcode == 6'b100011);
-	assign BfromMemLW = (if_rt==exe_rt) & (if_rt!=0) & (exe_OPcode == 6'b100011);
+	assign BfromMem = (if_rt==exe_rd) & (if_rt!=0) & (exe_OPcode == 6'b000000)  & (i_type_if==0);
+	assign AfromExLW = (if_rs==rt) & (if_rs!=0) & (OPcode == 6'b100011) ;
+	assign BfromExLW = (if_rt==rt) & (if_rt!=0) & (OPcode == 6'b100011) & (i_type_if==0);
+	assign AfromMemLW = (if_rs==exe_rt) & (if_rs!=0) & (exe_OPcode == 6'b100011) ;
+	assign BfromMemLW = (if_rt==exe_rt) & (if_rt!=0) & (exe_OPcode == 6'b100011)& (i_type_if==0);
 	
 	assign stall = AfromEx || BfromEx || AfromMem || BfromMem || AfromExLW || BfromExLW || AfromMemLW || BfromMemLW;
 
