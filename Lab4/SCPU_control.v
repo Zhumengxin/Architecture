@@ -51,7 +51,8 @@ module SCPU_control(
 	
 	output reg if_rst,  // stage reset signal
 	output reg if_en,  // stage enable signal
-	
+	output reg if_valid,
+
 	output reg id_rst,
 	output reg id_en,
 
@@ -100,7 +101,9 @@ module SCPU_control(
 	wire [4:0] if_rd;
 
 	wire [1:0] Forwardb;
-
+	initial begin
+		ir_en <= 1;
+	end
 
 	//assign mem_w = MemWrite && (~MemRead);
 	assign OPcode = inst[31:26];
@@ -115,18 +118,18 @@ module SCPU_control(
 	assign if_rt[4:0] = if_inst[20:16];
 	assign if_rd[4:0] = if_inst[15:11];
 	//assign if_func[5:0] = if_inst[5:0];
-	assign i_type_if = (if_OPcode > 6'h07 && if_OPcode <6'h10)?1:0;	
+	assign i_type_if = (if_OPcode > 6'h07 && if_OPcode <6'h9)?1:0;	
 
 	assign exe_OPcode[5:0] = exe_inst[31:26];
 	assign exe_rs[4:0] = exe_inst[25:21];
 	assign exe_rt[4:0] = exe_inst[20:16];
 	assign exe_rd[4:0] = exe_inst[15:11];
-	assign i_type_exe = (exe_OPcode > 6'h07 && exe_OPcode <6'h10)?1:0;
+	assign i_type_exe = (exe_OPcode > 6'h07 && exe_OPcode <6'h9)?1:0;
 
 	assign mem_OPcode[5:0] = mem_inst[31:26];
 	assign mem_rt[4:0] = mem_inst[20:16];
 	assign mem_rd[4:0] = mem_inst[15:11];
-	assign i_type_mem = (mem_OPcode > 6'h07 && mem_OPcode <6'h10)?1:0;
+	assign i_type_mem = (mem_OPcode > 6'h07 && mem_OPcode <6'h9)?1:0;
 
 	assign wb_rd[4:0] = wb_inst[15:11];
 	assign wb_rt[4:0] = wb_inst[20:16];
@@ -140,17 +143,26 @@ module SCPU_control(
 
 	always @ (OPcode or Fun) begin
 		case(OPcode)
-			6'h10:begin case({inst[25:21],Fun})
-				11'b00000xxxxxx: begin  `CPU_ctrl_signals <= 18'b1_0_00_1_0_0_00_0_010_0_00_01; end  //mfc
-				11'b00100xxxxxx: begin  `CPU_ctrl_signals <= 18'b1_0_00_0_0_0_00_0_010_0_00_10; end  //mtc
-				11'b1xxxx011000: begin  `CPU_ctrl_signals <= 18'b0_1_00_0_1_0_00_0_010_0_00_11; end   //eret
-			endcase end
+			// 6'h10:begin case({inst[25:21],Fun})
+			// 	11'b00000xxxxxx: begin  `CPU_ctrl_signals <= 18'b1_0_00_1_0_0_00_0_010_0_00_01; end  //mfc
+			// 	11'b00100xxxxxx: begin  `CPU_ctrl_signals <= 18'b1_0_00_0_0_0_00_0_010_0_00_10; end  //mtc
+			// 	11'b1xxxx011000: begin  `CPU_ctrl_signals <= 18'b0_1_00_0_1_0_00_0_010_0_00_11; end   //eret
+			// endcase end
+			6'h10: begin
+				if(inst[25:21]==5'b00000)
+					`CPU_ctrl_signals <= 18'b1_0_00_1_0_0_00_0_010_0_00_01;
+				else if(inst[25:21]==5'b00100)
+					`CPU_ctrl_signals <= 18'b1_0_00_0_0_0_00_0_010_0_00_10;
+				else if(Fun==6'b011000)
+					`CPU_ctrl_signals <= 18'b0_1_00_0_1_0_00_0_010_0_00_11;
+			end
 			6'b100011: begin `CPU_ctrl_signals <= 18'b0_1_01_1_1_0_00_0_010_0_00_00; end // load
 			6'b101011: begin `CPU_ctrl_signals <= 18'bx_1_xx_0_0_1_00_0_010_0_00_00; end // store
 			6'b000100: begin `CPU_ctrl_signals <= 18'bx_0_xx_0_0_0_00_0_110_0_10_00; end // beq   //not sure for lock
 			6'b000010: begin `CPU_ctrl_signals <= 18'bx_x_xx_0_0_0_10_0_xxx_0_00_00; end // jump    //not sure
 			6'h0A: begin `CPU_ctrl_signals <= 18'b0_1_00_1_0_0_00_0_111_0_00_00; end // slti
 			6'h08: begin `CPU_ctrl_signals <= 18'b0_1_00_1_0_0_00_0_010_0_00_00; end // addi
+			6'h09: begin `CPU_ctrl_signals <= 18'b0_1_00_1_0_0_00_0_010_0_00_00; end // addi
 			6'h0C: begin `CPU_ctrl_signals <= 18'b0_1_00_1_0_0_00_0_000_0_00_00; end // andi
 			6'h0D: begin `CPU_ctrl_signals <= 18'b0_1_00_1_0_0_00_0_001_0_00_00; end // ori
 			6'h0E: begin `CPU_ctrl_signals <= 18'b0_1_00_1_0_0_00_0_011_0_00_00; end // xori
@@ -178,7 +190,7 @@ module SCPU_control(
 
 	//stall detect
 	assign AfromEx = ((rs==exe_rd) & (rs != 0) & (exe_OPcode == 6'b000000)) || ((rs==exe_rt) & (rs != 0) & (i_type_exe==1));
-	assign BfromEx = ((rt==exe_rd) & (rt != 0) & (exe_OPcode == 6'b000000)) || ((rt==exe_rt) & (rt != 0) & (i_type_exe==1));
+	assign BfromEx = ((rt==exe_rd) & (rt != 0) & (exe_OPcode == 6'b000000)) || ((rt==exe_rt) & (rt != 0) & (i_type_exe==1)) || ((rt==exe_rt) & (int_type==2'b10));
 	assign AfromMem = ((rs==mem_rd) & (rs!= 0) & (mem_OPcode == 6'b000000)) ||  ((rs==mem_rt) & (rs != 0) & (i_type_mem==1));
 	assign BfromMem = ((rt==mem_rd) & (rt!= 0) & (mem_OPcode == 6'b000000)) ||  ((rt==mem_rt) & (rt != 0) & (i_type_mem==1));
 	
@@ -211,10 +223,16 @@ module SCPU_control(
 		debug_step_prev <= debug_step;
 	end
 	`endif
-	
+
+	always @(posedge clk) begin
+		if (jump_en)
+			ir_en <= ir_en + 1;
+	end
+
 	always @(*) begin
 		if_rst=0;
 		if_en=1;
+		if_valid=1;
 		id_rst=0;
 		id_en=1;
 		exe_rst=0;
@@ -241,7 +259,8 @@ module SCPU_control(
 		end
 		`endif
 		else if(Branch_mem != 2'b00) begin
-	   		
+	   		//if_rst=1;
+	   		if_valid = 0;
 	   		id_rst=1;
 	   		exe_rst=1;
 	   		mem_rst=1;
@@ -254,7 +273,8 @@ module SCPU_control(
 	   	else if (jump_en) begin
 			
 			id_rst = 1;
-			
+			exe_rst = 1;
+			mem_rst=1;
 		end
 	    //else if(exe_branch) begin
 	     		//if_rst=1;

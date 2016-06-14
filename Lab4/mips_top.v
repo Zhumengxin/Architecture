@@ -31,7 +31,7 @@ module mips_top (
 	// anti-jitter
 	wire [3:0] switch;
 	wire btn_reset, btn_step;
-	wire btn_interrupt;
+	wire btn_int2;
 	wire disp_prev, disp_next;
 	wire btn_int;
 	
@@ -51,7 +51,7 @@ module mips_top (
 	anti_jitter #(.CLK_FREQ(50), .JITTER_MAX(10000), .INIT_VALUE(0))
 		AJ_ROTCTR (.clk(clk_disp), .rst(1'b0), .sig_i(ROTCTR), .sig_o());
 	anti_jitter #(.CLK_FREQ(50), .JITTER_MAX(10000), .INIT_VALUE(0))
-		AJ_BTNE (.clk(clk_disp), .rst(1'b0), .sig_i(BTNE), .sig_o(btn_interrupt));
+		AJ_BTNE (.clk(clk_disp), .rst(1'b0), .sig_i(BTNE), .sig_o(btn_int2));
 	anti_jitter #(.CLK_FREQ(50), .JITTER_MAX(10000), .INIT_VALUE(0))
 		AJ_BTNS (.clk(clk_disp), .rst(1'b0), .sig_i(BTNS), .sig_o(btn_step));
 	anti_jitter #(.CLK_FREQ(50), .JITTER_MAX(10000), .INIT_VALUE(0))
@@ -63,7 +63,7 @@ module mips_top (
 		switch = SW,
 		disp_prev = ROTA,
 		disp_next = ROTB,
-		btn_interrupt = BTNE,
+		btn_int2 = BTNE,
 		btn_step = BTNS,
 		btn_reset = BTNN,
 		btn_int = BTNW;
@@ -79,13 +79,17 @@ module mips_top (
 	end
 	//int
 	reg btn_int_prev,real_int;
+	reg int_cause;
 	always @(posedge clk_cpu) begin
-		btn_int_prev <= btn_int;
+		btn_int_prev <= (btn_int || btn_int2);
 	end
 	always @(posedge clk_cpu) begin
 		real_int <= 0;
-		if (~btn_int_prev && btn_int) 
+		int_cause <=0;
+		if (~btn_int_prev && (btn_int || btn_int2)) begin
 			real_int <= 1;
+			int_cause <= (btn_int)?0:1;
+		end
 	end
 	
 	// display
@@ -150,6 +154,7 @@ module mips_top (
 		`endif
 		.clk(clk_cpu),
 		.rst(rst_all),
+		.int_cause(int_cause),
 		.interrupter(real_int)
 
 		);

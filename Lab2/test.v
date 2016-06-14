@@ -4,10 +4,10 @@
 // Company: 
 // Engineer:
 //
-// Create Date:   22:25:38 05/24/2016
+// Create Date:   16:48:29 05/29/2016
 // Design Name:   mips_top
-// Module Name:   Y:/Documents/ARCH/Lab2/test.v
-// Project Name:  Lab2
+// Module Name:   Y:/Documents/ARCH/Lab3/mips_test.v
+// Project Name:  Lab3
 // Target Device:  
 // Tool versions:  
 // Description: 
@@ -22,7 +22,7 @@
 // 
 ////////////////////////////////////////////////////////////////////////////////
 
-module test;
+module mips_test;
 
 	// Inputs
 	reg CCLK;
@@ -41,6 +41,7 @@ module test;
 	wire LCDRS;
 	wire LCDRW;
 	wire [3:0] LCDDAT;
+	reg[31:0] count,count1;
 
 	// Instantiate the Unit Under Test (UUT)
 	mips_top uut (
@@ -59,11 +60,11 @@ module test;
 		.LCDRW(LCDRW), 
 		.LCDDAT(LCDDAT)
 	);
-
+   //parameter count=0;
 	initial begin
 		// Initialize Inputs
 		CCLK = 0;
-		SW = 0;
+		SW = 1011;
 		BTNN = 0;
 		BTNE = 0;
 		BTNS = 0;
@@ -71,17 +72,28 @@ module test;
 		ROTA = 0;
 		ROTB = 0;
 		ROTCTR = 0;
-
+		count=0;
+		count1=0;
 		// Wait 100 ns for global reset to finish
 		#100;
-        
+      //count=1;
+		
 		// Add stimulus here
-		forever begin
-			CCLK = ~CCLK;
-			#10;
-			
-		end
+		
+
 	end
+	always begin
+			CCLK = ~CCLK;
+			count = count + 1;
+			//count1 = count;
+			BTNS =0;
+			if(count == 32'h14) begin
+				BTNS=1;
+				count = 0;
+				//count1 =0;
+			end
+			#10;
+		end
       
 endmodule
 

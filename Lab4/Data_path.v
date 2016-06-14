@@ -46,6 +46,7 @@ module Data_path(
 
 		input if_rst,
 		input if_en,
+		input if_valid,
 		input id_rst,
 		input id_en,
 		input exe_rst,
@@ -60,7 +61,7 @@ module Data_path(
 		output overflow,   //no use temply
 
 		input wire[1:0] ForwardA,
-		input wire[1:0] ForwardB,
+		input wire[2:0] ForwardB,
 		input wire ForwardM,
 
 
@@ -174,7 +175,8 @@ module Data_path(
 	
 
 	initial begin
-		
+		inst_ren=0;
+		Branch_mem=0;
 	end
 
 
@@ -196,6 +198,10 @@ module Data_path(
 			inst_ren <= 0;
 			inst_addr <= 0;
 		end
+		else if(if_valid==0) begin
+			inst_ren <= 0;
+			inst_addr <=PC_out;
+		end
 		
 		//else if (branch_stall)begin
 	//		inst_ren <= 0;
@@ -210,12 +216,12 @@ module Data_path(
 
 	end
 
-	Decode_pc_Int  U3 ( .clk(clk),
-						.rst(rst),
-						.INT(1'b0), 
-						.pc_next(pc_next_final[31:0]), 
-						.RFE(1'b0), 
-						.pc(PC_out[31:0]));
+	// Decode_pc_Int  U3 ( .clk(clk),
+	// 					.rst(rst),
+	// 					.INT(1'b0), 
+	// 					.pc_next(pc_next_final[31:0]), 
+	// 					.RFE(1'b0), 
+	// 					.pc(PC_out[31:0]));
 
 	mux4to1_32  ChoosePC (	.a(pc_4_if_wire[31:0]), 
 						.b(branch_pc_mem[31:0]), 
@@ -228,9 +234,12 @@ module Data_path(
 	mux2to1_32  ChoosePC_int(.a(jump_addr),
 							.b(pc_next),
 							.sel(jump_en),
-							.o(pc_next_final));
+							.o(PC_out[31:0]));
 
 	assign ret_addr = (Branch_mem!= 2'b00)? inst_addr_id:inst_addr;
+	//assign ret_addr = inst_addr_mem;
+	
+
 
 	//id 
 	always @(posedge clk) begin
@@ -262,7 +271,7 @@ module Data_path(
 		//data_rt = Data_out_DUMMY[31:0];
 
 	
-	assign cp_addr_r = inst_data_id[15:11];//RD
+	
 
 
 	Ext_32  Ext32 (.imm_16(inst_data_id[15:0]), 
@@ -304,8 +313,8 @@ module Data_path(
 						.o(data_rt_final)
 						);
   	
-  	 assign cp_data_w = data_rt_final;
-	
+  	assign cp_data_w = data_rt_final;
+	assign cp_addr_r = inst_data_id[15:11];//RD
 
 
     //exe stage

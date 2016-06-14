@@ -230,7 +230,8 @@ module SCPU_control(
 		end
 		`endif
 		else if(Branch_mem != 2'b00) begin
-	   		
+			// if_en=0;
+	  //  		if_rst=1;
 	   		id_rst=1;
 	   		exe_rst=1;
 	   		mem_rst=1;

@@ -41,7 +41,8 @@ module mips_test;
 	wire LCDRS;
 	wire LCDRW;
 	wire [3:0] LCDDAT;
-
+	reg[31:0] count,count1;
+	reg ir_in;
 	// Instantiate the Unit Under Test (UUT)
 	mips_top uut (
 		.CCLK(CCLK), 
@@ -59,11 +60,11 @@ module mips_test;
 		.LCDRW(LCDRW), 
 		.LCDDAT(LCDDAT)
 	);
-
+   //parameter count=0;
 	initial begin
 		// Initialize Inputs
 		CCLK = 0;
-		SW = 0000;
+		SW = 1011;
 		BTNN = 0;
 		BTNE = 0;
 		BTNS = 0;
@@ -71,17 +72,38 @@ module mips_test;
 		ROTA = 0;
 		ROTB = 0;
 		ROTCTR = 0;
-
+		count=0;
+		count1=0;
+		ir_in=0;
 		// Wait 100 ns for global reset to finish
 		#100;
-        
+      //count=1;
+		
 		// Add stimulus here
-		forever begin
-			CCLK = ~CCLK;
-			#10;
-		end
+		
 
 	end
+	always begin
+			CCLK = ~CCLK;
+			count = count + 1;
+			//count1 = count;
+			BTNS =0;
+			//BTNW=0;
+			if(count == 32'h40) begin
+				BTNS=1;
+				count = 0;
+				count1 = count1 + 1;
+				if(count1 == 32'hA)begin
+					BTNW=1;
+					count1=0;
+				end
+
+				
+				
+				//count1 =0;
+			end
+			#10;
+		end
       
 endmodule
 

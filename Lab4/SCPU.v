@@ -39,6 +39,7 @@ module SCPU(// debug
 	output wire [31:0] mem_addr,  // address of memory
 	output wire [31:0] mem_dout,  // data writing to memory
 	input wire [31:0] mem_din,  // data read from memory
+	input wire int_cause,
 	input wire ir_in
     );
 	
@@ -54,7 +55,7 @@ module SCPU(// debug
 	 //new for lab2
 	 wire rs_lock,rt_lock;
 	 wire stall,branch_stall;
-	 wire if_rst, if_en;
+	 wire if_rst, if_en,if_valid;
 	 wire id_rst, id_en;
 	 wire exe_rst, exe_en;
 	 wire mem_rst, mem_en;
@@ -110,7 +111,7 @@ module SCPU(// debug
 		.rt_lock(rt_lock),
 		.if_rst(if_rst),
 		.if_en(if_en),
-		
+		.if_valid(if_valid),
 		.id_rst(id_rst),
 		.id_en(id_en),
 		
@@ -164,6 +165,7 @@ module SCPU(// debug
 		//.rt_lock(rt_lock),
 		.if_rst(if_rst),
 		.if_en(if_en),
+		.if_valid(if_valid),
 		.id_rst(id_rst),
 		.id_en(id_en),
 		.exe_rst(exe_rst),
@@ -217,6 +219,7 @@ assign cp_addr_w = cp_addr_r;
     .rst(rst),
     .ir_en(ir_en),//in
     .ir_in(ir_in),//in
+    .int_cause(int_cause),
     .ret_addr(ret_addr),//in
     .jump_en(jump_en),//out
     .jump_addr(jump_addr)//out

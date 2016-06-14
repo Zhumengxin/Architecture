@@ -28,6 +28,7 @@ module mips(
 	   `endif
 		input wire clk,
 		input wire rst,
+		input wire int_cause,
 		input wire interrupter
     );
 	 
@@ -71,6 +72,7 @@ module mips(
 		.mem_addr(mem_data_addr),
 		.mem_dout(mem_data_write),
 		.mem_din(mem_data_read),
+		.int_cause(int_cause),
 		.ir_in(interrupter)
 		);
 	
