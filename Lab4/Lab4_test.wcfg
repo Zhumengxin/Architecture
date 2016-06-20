@@ -10,15 +10,22 @@
          </top_modules>
       </db_ref>
    </db_ref_list>
-   <WVObjectSize size="53" />
-   <wvobject fp_name="/mips_test/uut/MIPS/SCPU/Data_path/inst_ren" type="logic" db_ref_id="1">
-      <obj_property name="ElementShortName">inst_ren</obj_property>
-      <obj_property name="ObjectShortName">inst_ren</obj_property>
+   <WVObjectSize size="11" />
+   <wvobject fp_name="/mips_test/BTNE" type="logic" db_ref_id="1">
+      <obj_property name="ElementShortName">BTNE</obj_property>
+      <obj_property name="ObjectShortName">BTNE</obj_property>
    </wvobject>
-   <wvobject fp_name="/mips_test/uut/MIPS/SCPU/Data_path/inst_addr" type="array" db_ref_id="1">
-      <obj_property name="ElementShortName">inst_addr[31:0]</obj_property>
-      <obj_property name="ObjectShortName">inst_addr[31:0]</obj_property>
-      <obj_property name="Radix">HEXRADIX</obj_property>
+   <wvobject fp_name="/mips_test/BTNS" type="logic" db_ref_id="1">
+      <obj_property name="ElementShortName">BTNS</obj_property>
+      <obj_property name="ObjectShortName">BTNS</obj_property>
+   </wvobject>
+   <wvobject fp_name="/mips_test/BTNW" type="logic" db_ref_id="1">
+      <obj_property name="ElementShortName">BTNW</obj_property>
+      <obj_property name="ObjectShortName">BTNW</obj_property>
+   </wvobject>
+   <wvobject fp_name="/mips_test/ir_in" type="logic" db_ref_id="1">
+      <obj_property name="ElementShortName">ir_in</obj_property>
+      <obj_property name="ObjectShortName">ir_in</obj_property>
    </wvobject>
    <wvobject fp_name="/mips_test/uut/MIPS/SCPU/Data_path/inst_data" type="array" db_ref_id="1">
       <obj_property name="ElementShortName">inst_data[31:0]</obj_property>
@@ -30,14 +37,14 @@
       <obj_property name="ObjectShortName">inst_data_id[31:0]</obj_property>
       <obj_property name="Radix">HEXRADIX</obj_property>
    </wvobject>
-   <wvobject fp_name="/mips_test/uut/MIPS/SCPU/Data_path/inst_data_exe" type="array" db_ref_id="1">
-      <obj_property name="ElementShortName">inst_data_exe[31:0]</obj_property>
-      <obj_property name="ObjectShortName">inst_data_exe[31:0]</obj_property>
-      <obj_property name="Radix">HEXRADIX</obj_property>
-   </wvobject>
    <wvobject fp_name="/mips_test/uut/MIPS/SCPU/Data_path/inst_data_mem" type="array" db_ref_id="1">
       <obj_property name="ElementShortName">inst_data_mem[31:0]</obj_property>
       <obj_property name="ObjectShortName">inst_data_mem[31:0]</obj_property>
+      <obj_property name="Radix">HEXRADIX</obj_property>
+   </wvobject>
+   <wvobject fp_name="/mips_test/uut/MIPS/SCPU/Data_path/inst_data_exe" type="array" db_ref_id="1">
+      <obj_property name="ElementShortName">inst_data_exe[31:0]</obj_property>
+      <obj_property name="ObjectShortName">inst_data_exe[31:0]</obj_property>
       <obj_property name="Radix">HEXRADIX</obj_property>
    </wvobject>
    <wvobject fp_name="/mips_test/uut/MIPS/SCPU/Data_path/inst_data_wb" type="array" db_ref_id="1">
@@ -45,210 +52,13 @@
       <obj_property name="ObjectShortName">inst_data_wb[31:0]</obj_property>
       <obj_property name="Radix">HEXRADIX</obj_property>
    </wvobject>
-   <wvobject fp_name="/mips_test/uut/MIPS/SCPU/Data_path/inst_addr_id" type="array" db_ref_id="1">
-      <obj_property name="ElementShortName">inst_addr_id[31:0]</obj_property>
-      <obj_property name="ObjectShortName">inst_addr_id[31:0]</obj_property>
-      <obj_property name="Radix">HEXRADIX</obj_property>
-   </wvobject>
-   <wvobject fp_name="/mips_test/uut/MIPS/SCPU/Data_path/inst_addr_exe" type="array" db_ref_id="1">
-      <obj_property name="ElementShortName">inst_addr_exe[31:0]</obj_property>
-      <obj_property name="ObjectShortName">inst_addr_exe[31:0]</obj_property>
-      <obj_property name="Radix">HEXRADIX</obj_property>
-   </wvobject>
-   <wvobject fp_name="/mips_test/uut/MIPS/SCPU/Data_path/inst_addr_mem" type="array" db_ref_id="1">
-      <obj_property name="ElementShortName">inst_addr_mem[31:0]</obj_property>
-      <obj_property name="ObjectShortName">inst_addr_mem[31:0]</obj_property>
-      <obj_property name="Radix">HEXRADIX</obj_property>
-   </wvobject>
-   <wvobject fp_name="/mips_test/uut/MIPS/SCPU/Data_path/inst_addr_wb" type="array" db_ref_id="1">
-      <obj_property name="ElementShortName">inst_addr_wb[31:0]</obj_property>
-      <obj_property name="ObjectShortName">inst_addr_wb[31:0]</obj_property>
-      <obj_property name="Radix">HEXRADIX</obj_property>
-   </wvobject>
-   <wvobject fp_name="/mips_test/uut/MIPS/SCPU/Data_path/ALU_A" type="array" db_ref_id="1">
-      <obj_property name="ElementShortName">ALU_A[31:0]</obj_property>
-      <obj_property name="ObjectShortName">ALU_A[31:0]</obj_property>
-      <obj_property name="Radix">HEXRADIX</obj_property>
-   </wvobject>
-   <wvobject fp_name="/mips_test/uut/MIPS/SCPU/Data_path/ALU_out_DUMMY" type="array" db_ref_id="1">
-      <obj_property name="ElementShortName">ALU_out_DUMMY[31:0]</obj_property>
-      <obj_property name="ObjectShortName">ALU_out_DUMMY[31:0]</obj_property>
-      <obj_property name="Radix">HEXRADIX</obj_property>
-   </wvobject>
-   <wvobject fp_name="/mips_test/uut/MIPS/SCPU/Data_path/pc_next" type="array" db_ref_id="1">
-      <obj_property name="ElementShortName">pc_next[31:0]</obj_property>
-      <obj_property name="ObjectShortName">pc_next[31:0]</obj_property>
-      <obj_property name="Radix">HEXRADIX</obj_property>
+   <wvobject fp_name="/mips_test/uut/MIPS/SCPU/Data_path/jump_en" type="logic" db_ref_id="1">
+      <obj_property name="ElementShortName">jump_en</obj_property>
+      <obj_property name="ObjectShortName">jump_en</obj_property>
    </wvobject>
    <wvobject fp_name="/mips_test/uut/MIPS/SCPU/Data_path/jump_addr" type="array" db_ref_id="1">
       <obj_property name="ElementShortName">jump_addr[31:0]</obj_property>
       <obj_property name="ObjectShortName">jump_addr[31:0]</obj_property>
       <obj_property name="Radix">HEXRADIX</obj_property>
-   </wvobject>
-   <wvobject fp_name="/mips_test/uut/MIPS/SCPU/Data_path/PC_out" type="array" db_ref_id="1">
-      <obj_property name="ElementShortName">PC_out[31:0]</obj_property>
-      <obj_property name="ObjectShortName">PC_out[31:0]</obj_property>
-      <obj_property name="Radix">HEXRADIX</obj_property>
-   </wvobject>
-   <wvobject fp_name="/mips_test/uut/MIPS/SCPU/CP0/int_cause" type="logic" db_ref_id="1">
-      <obj_property name="ElementShortName">int_cause</obj_property>
-      <obj_property name="ObjectShortName">int_cause</obj_property>
-   </wvobject>
-   <wvobject fp_name="/mips_test/uut/MIPS/interrupter" type="logic" db_ref_id="1">
-      <obj_property name="ElementShortName">interrupter</obj_property>
-      <obj_property name="ObjectShortName">interrupter</obj_property>
-   </wvobject>
-   <wvobject fp_name="/mips_test/uut/MIPS/SCPU/CP0/ir_in" type="logic" db_ref_id="1">
-      <obj_property name="ElementShortName">ir_in</obj_property>
-      <obj_property name="ObjectShortName">ir_in</obj_property>
-   </wvobject>
-   <wvobject fp_name="/mips_test/uut/MIPS/SCPU/CP0/jump_en" type="logic" db_ref_id="1">
-      <obj_property name="ElementShortName">jump_en</obj_property>
-      <obj_property name="ObjectShortName">jump_en</obj_property>
-   </wvobject>
-   <wvobject fp_name="/mips_test/uut/MIPS/SCPU/Data_path/Branch_mem" type="array" db_ref_id="1">
-      <obj_property name="ElementShortName">Branch_mem[1:0]</obj_property>
-      <obj_property name="ObjectShortName">Branch_mem[1:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/mips_test/uut/MIPS/SCPU/Data_path/cp_addr_r" type="array" db_ref_id="1">
-      <obj_property name="ElementShortName">cp_addr_r[4:0]</obj_property>
-      <obj_property name="ObjectShortName">cp_addr_r[4:0]</obj_property>
-      <obj_property name="Radix">HEXRADIX</obj_property>
-   </wvobject>
-   <wvobject fp_name="/mips_test/uut/MIPS/SCPU/Data_path/cp_data_r" type="array" db_ref_id="1">
-      <obj_property name="ElementShortName">cp_data_r[31:0]</obj_property>
-      <obj_property name="ObjectShortName">cp_data_r[31:0]</obj_property>
-      <obj_property name="Radix">HEXRADIX</obj_property>
-   </wvobject>
-   <wvobject fp_name="/mips_test/uut/MIPS/SCPU/Data_path/cp_data_w" type="array" db_ref_id="1">
-      <obj_property name="ElementShortName">cp_data_w[31:0]</obj_property>
-      <obj_property name="ObjectShortName">cp_data_w[31:0]</obj_property>
-      <obj_property name="Radix">HEXRADIX</obj_property>
-   </wvobject>
-   <wvobject fp_name="/mips_test/uut/MIPS/SCPU/SCPU_control/int_type" type="array" db_ref_id="1">
-      <obj_property name="ElementShortName">int_type[1:0]</obj_property>
-      <obj_property name="ObjectShortName">int_type[1:0]</obj_property>
-      <obj_property name="Radix">HEXRADIX</obj_property>
-   </wvobject>
-   <wvobject fp_name="/mips_test/uut/MIPS/SCPU/CP0/oper" type="array" db_ref_id="1">
-      <obj_property name="ElementShortName">oper[1:0]</obj_property>
-      <obj_property name="ObjectShortName">oper[1:0]</obj_property>
-      <obj_property name="Radix">HEXRADIX</obj_property>
-   </wvobject>
-   <wvobject fp_name="/mips_test/uut/MIPS/SCPU/CP0/addr_r" type="array" db_ref_id="1">
-      <obj_property name="ElementShortName">addr_r[4:0]</obj_property>
-      <obj_property name="ObjectShortName">addr_r[4:0]</obj_property>
-      <obj_property name="Radix">HEXRADIX</obj_property>
-   </wvobject>
-   <wvobject fp_name="/mips_test/uut/MIPS/SCPU/CP0/addr_w" type="array" db_ref_id="1">
-      <obj_property name="ElementShortName">addr_w[4:0]</obj_property>
-      <obj_property name="ObjectShortName">addr_w[4:0]</obj_property>
-      <obj_property name="Radix">HEXRADIX</obj_property>
-   </wvobject>
-   <wvobject fp_name="/mips_test/uut/MIPS/SCPU/CP0/data_w" type="array" db_ref_id="1">
-      <obj_property name="ElementShortName">data_w[31:0]</obj_property>
-      <obj_property name="ObjectShortName">data_w[31:0]</obj_property>
-      <obj_property name="Radix">HEXRADIX</obj_property>
-   </wvobject>
-   <wvobject fp_name="/mips_test/uut/MIPS/SCPU/CP0/rst" type="logic" db_ref_id="1">
-      <obj_property name="ElementShortName">rst</obj_property>
-      <obj_property name="ObjectShortName">rst</obj_property>
-   </wvobject>
-   <wvobject fp_name="/mips_test/uut/MIPS/SCPU/CP0/ir_en" type="logic" db_ref_id="1">
-      <obj_property name="ElementShortName">ir_en</obj_property>
-      <obj_property name="ObjectShortName">ir_en</obj_property>
-   </wvobject>
-   <wvobject fp_name="/mips_test/uut/MIPS/SCPU/CP0/ir_in" type="logic" db_ref_id="1">
-      <obj_property name="ElementShortName">ir_in</obj_property>
-      <obj_property name="ObjectShortName">ir_in</obj_property>
-   </wvobject>
-   <wvobject fp_name="/mips_test/uut/MIPS/SCPU/CP0/ret_addr" type="array" db_ref_id="1">
-      <obj_property name="ElementShortName">ret_addr[31:0]</obj_property>
-      <obj_property name="ObjectShortName">ret_addr[31:0]</obj_property>
-      <obj_property name="Radix">HEXRADIX</obj_property>
-   </wvobject>
-   <wvobject fp_name="/mips_test/uut/MIPS/SCPU/SCPU_control/jump_en" type="logic" db_ref_id="1">
-      <obj_property name="ElementShortName">jump_en</obj_property>
-      <obj_property name="ObjectShortName">jump_en</obj_property>
-   </wvobject>
-   <wvobject fp_name="/mips_test/uut/MIPS/SCPU/CP0/ir" type="logic" db_ref_id="1">
-      <obj_property name="ElementShortName">ir</obj_property>
-      <obj_property name="ObjectShortName">ir</obj_property>
-   </wvobject>
-   <wvobject fp_name="/mips_test/uut/MIPS/SCPU/CP0/data_r" type="array" db_ref_id="1">
-      <obj_property name="ElementShortName">data_r[31:0]</obj_property>
-      <obj_property name="ObjectShortName">data_r[31:0]</obj_property>
-      <obj_property name="Radix">HEXRADIX</obj_property>
-   </wvobject>
-   <wvobject fp_name="/mips_test/uut/MIPS/SCPU/CP0/jump_addr" type="array" db_ref_id="1">
-      <obj_property name="ElementShortName">jump_addr[31:0]</obj_property>
-      <obj_property name="ObjectShortName">jump_addr[31:0]</obj_property>
-      <obj_property name="Radix">HEXRADIX</obj_property>
-   </wvobject>
-   <wvobject fp_name="/mips_test/uut/MIPS/SCPU/CP0/ir_wait" type="logic" db_ref_id="1">
-      <obj_property name="ElementShortName">ir_wait</obj_property>
-      <obj_property name="ObjectShortName">ir_wait</obj_property>
-   </wvobject>
-   <wvobject fp_name="/mips_test/uut/MIPS/SCPU/CP0/ir_valid" type="logic" db_ref_id="1">
-      <obj_property name="ElementShortName">ir_valid</obj_property>
-      <obj_property name="ObjectShortName">ir_valid</obj_property>
-   </wvobject>
-   <wvobject fp_name="/mips_test/uut/MIPS/SCPU/CP0/eret" type="logic" db_ref_id="1">
-      <obj_property name="ElementShortName">eret</obj_property>
-      <obj_property name="ObjectShortName">eret</obj_property>
-   </wvobject>
-   <wvobject fp_name="/mips_test/uut/MIPS/SCPU/CP0/EHBR" type="array" db_ref_id="1">
-      <obj_property name="ElementShortName">EHBR[31:0]</obj_property>
-      <obj_property name="ObjectShortName">EHBR[31:0]</obj_property>
-      <obj_property name="Radix">HEXRADIX</obj_property>
-   </wvobject>
-   <wvobject fp_name="/mips_test/uut/MIPS/SCPU/CP0/EPCR" type="array" db_ref_id="1">
-      <obj_property name="ElementShortName">EPCR[31:0]</obj_property>
-      <obj_property name="ObjectShortName">EPCR[31:0]</obj_property>
-      <obj_property name="Radix">HEXRADIX</obj_property>
-   </wvobject>
-   <wvobject fp_name="/mips_test/uut/MIPS/SCPU/CP0/CAUSE" type="array" db_ref_id="1">
-      <obj_property name="ElementShortName">CAUSE[31:0]</obj_property>
-      <obj_property name="ObjectShortName">CAUSE[31:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/mips_test/uut/MIPS/SCPU/Data_path/if_rst" type="logic" db_ref_id="1">
-      <obj_property name="ElementShortName">if_rst</obj_property>
-      <obj_property name="ObjectShortName">if_rst</obj_property>
-   </wvobject>
-   <wvobject fp_name="/mips_test/uut/MIPS/SCPU/Data_path/if_en" type="logic" db_ref_id="1">
-      <obj_property name="ElementShortName">if_en</obj_property>
-      <obj_property name="ObjectShortName">if_en</obj_property>
-   </wvobject>
-   <wvobject fp_name="/mips_test/uut/MIPS/SCPU/Data_path/id_rst" type="logic" db_ref_id="1">
-      <obj_property name="ElementShortName">id_rst</obj_property>
-      <obj_property name="ObjectShortName">id_rst</obj_property>
-   </wvobject>
-   <wvobject fp_name="/mips_test/uut/MIPS/SCPU/Data_path/id_en" type="logic" db_ref_id="1">
-      <obj_property name="ElementShortName">id_en</obj_property>
-      <obj_property name="ObjectShortName">id_en</obj_property>
-   </wvobject>
-   <wvobject fp_name="/mips_test/uut/MIPS/SCPU/Data_path/exe_rst" type="logic" db_ref_id="1">
-      <obj_property name="ElementShortName">exe_rst</obj_property>
-      <obj_property name="ObjectShortName">exe_rst</obj_property>
-   </wvobject>
-   <wvobject fp_name="/mips_test/uut/MIPS/SCPU/Data_path/exe_en" type="logic" db_ref_id="1">
-      <obj_property name="ElementShortName">exe_en</obj_property>
-      <obj_property name="ObjectShortName">exe_en</obj_property>
-   </wvobject>
-   <wvobject fp_name="/mips_test/uut/MIPS/SCPU/Data_path/mem_rst" type="logic" db_ref_id="1">
-      <obj_property name="ElementShortName">mem_rst</obj_property>
-      <obj_property name="ObjectShortName">mem_rst</obj_property>
-   </wvobject>
-   <wvobject fp_name="/mips_test/uut/MIPS/SCPU/Data_path/mem_en" type="logic" db_ref_id="1">
-      <obj_property name="ElementShortName">mem_en</obj_property>
-      <obj_property name="ObjectShortName">mem_en</obj_property>
-   </wvobject>
-   <wvobject fp_name="/mips_test/uut/MIPS/SCPU/Data_path/wb_rst" type="logic" db_ref_id="1">
-      <obj_property name="ElementShortName">wb_rst</obj_property>
-      <obj_property name="ObjectShortName">wb_rst</obj_property>
-   </wvobject>
-   <wvobject fp_name="/mips_test/uut/MIPS/SCPU/Data_path/wb_en" type="logic" db_ref_id="1">
-      <obj_property name="ElementShortName">wb_en</obj_property>
-      <obj_property name="ObjectShortName">wb_en</obj_property>
    </wvobject>
 </wave_config>

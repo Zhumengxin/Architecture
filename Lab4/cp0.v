@@ -85,7 +85,7 @@ module cp0(
 	
 	always @(*) begin
 		eret <= 0;
-		jump_addr <= 0;
+		//jump_addr <= 0;
 		if(ir)begin
 			jump_addr <= EHBR;
 		end
