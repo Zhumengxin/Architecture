@@ -73,6 +73,7 @@ module SCPU_control(
 
 	output reg [1:0] int_type,//out 2
     output reg ir_en,//out 1
+    input wire return_en,
 	 input wire jump_en
 	
     );
@@ -150,7 +151,7 @@ module SCPU_control(
 			// endcase end
 			6'h10: begin
 				if(inst[25:21]==5'b00000)
-					`CPU_ctrl_signals <= 18'b1_0_00_1_0_0_00_0_010_0_00_01;
+					`CPU_ctrl_signals <= 18'b0_0_00_1_0_0_00_0_010_1_00_01;
 				else if(inst[25:21]==5'b00100)
 					`CPU_ctrl_signals <= 18'b1_0_00_0_0_0_00_0_010_0_00_10;
 				else if(Fun==6'b011000)
@@ -226,7 +227,10 @@ module SCPU_control(
 
 	always @(posedge clk) begin
 		if (jump_en)
-			ir_en <= ir_en + 1;
+			ir_en =ir_en + 1;
+		else if(return_en)
+			ir_en = 1;
+		else;
 	end
 
 	always @(*) begin
@@ -258,6 +262,15 @@ module SCPU_control(
 			wb_en=0;
 		end
 		`endif
+		else if (jump_en) begin
+			
+			id_rst = 1;
+			exe_rst = 1;
+			mem_rst=1;
+		end
+		else if(return_en) begin
+			id_rst = 1; 
+		end
 		else if(Branch_mem != 2'b00) begin
 	   		//if_rst=1;
 	   		if_valid = 0;
@@ -270,12 +283,7 @@ module SCPU_control(
 			 id_rst=1;
 			 
 	   	end
-	   	else if (jump_en) begin
-			
-			id_rst = 1;
-			exe_rst = 1;
-			mem_rst=1;
-		end
+	   	
 	    //else if(exe_branch) begin
 	     		//if_rst=1;
 	    // 		if_en=1;

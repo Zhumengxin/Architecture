@@ -37,6 +37,7 @@ module cp0(
 	input wire ir_en, // interrupt enable
 	input wire ir_in, // external interrupt input
 	input wire int_cause,
+	output wire return_en,
 	input wire [31:0] ret_addr, // target instruction address to store when interrupt occurred
 	output wire jump_en, // force jump enable signal when interrupt authorised or ERET occurred
 	output reg [31:0] jump_addr // target instruction address to jump to
@@ -55,6 +56,7 @@ module cp0(
 		EHBR = 0;
 		EPCR = 0;
 		CAUSE = 0;
+		jump_addr = 0;
 	end
 	always @(posedge clk) begin
 		cause <= int_cause;
@@ -75,7 +77,8 @@ module cp0(
 	end
 	assign ir = ir_en & ir_wait & ir_valid;
 	
-	assign jump_en = ir||eret ;//|| ret_flag; 
+	assign jump_en = ir;//||eret ;//|| ret_flag; 
+	assign return_en  = eret;
 	/*always @(posedge clk) begin
 		jump_en <= 0;
 		if (ir||eret)

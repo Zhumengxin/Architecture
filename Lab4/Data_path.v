@@ -70,6 +70,8 @@ module Data_path(
 		output wire [31:0] cp_data_w,//out 32
 		output wire [31:0] ret_addr,//out 32
 		input wire jump_en,//in 1
+		input wire return_en,
+		output reg jump_sig,
 	    input wire [31:0] jump_addr//in 32
 
 		
@@ -173,10 +175,12 @@ module Data_path(
 	//debug_data[95:56] = {inst_addr[7:0],inst_addr_id[7:0],inst_addr_exe[7:0],inst_addr_mem[7:0],inst_addr_wb[7:0]};
 	`endif
 	
-
+	reg jump_end_sig;
 	initial begin
 		inst_ren=0;
 		Branch_mem=0;
+		jump_sig =0;
+		jump_end_sig=0;
 	end
 
 
@@ -192,6 +196,19 @@ module Data_path(
 	add_32  ALU_PC_4 (.a(inst_addr[31:0]), 
 						  .b(32'b00000000_00000000_00000000_00000100), 
 						  .c(pc_4_if_wire[31:0]));
+
+
+	always @(*) begin
+		if (jump_en || return_en) begin
+			
+			jump_sig = 1;
+			
+		end
+		else if(jump_end_sig)begin
+			jump_sig = 0;
+		end
+		else;
+	end
 	
 	always @(posedge clk) begin
 		if (if_rst) begin
@@ -208,9 +225,18 @@ module Data_path(
 	//		inst_addr <= PC_out;
 	//	end
 		else if (if_en) begin
-			inst_ren <= 1;
+			if(jump_sig) begin
+				inst_ren <= 1;
+				inst_addr <= jump_addr;
+				jump_end_sig <= 1;
+			end
+			else begin
+				inst_ren <= 1;
+				jump_end_sig <= 0;
 			//inst_addr <= is_branch_mem ? alu_out_mem[15:0]<<2 : inst_addr_next; //?
-		    inst_addr <= PC_out;
+		    	inst_addr <= PC_out;
+			end
+			
 
 		end
 
@@ -228,16 +254,16 @@ module Data_path(
 						.c({pc_4_mem[31:28], inst_data_mem[25:0], 2'b00}), 
 						.d(data_rs_mem[31:0]), 
 						.sel(Branch_mem[1:0]), 
-						.o(pc_next[31:0]));	
+						.o(PC_out[31:0]));	
 
 
-	mux2to1_32  ChoosePC_int(.a(jump_addr),
-							.b(pc_next),
-							.sel(jump_en),
-							.o(PC_out[31:0]));
+	// mux2to1_32  ChoosePC_int(.a(jump_addr),
+	// 						.b(pc_next),
+	// 						.sel(jump_en),
+	// 						.o(PC_out[31:0]));
 
-	assign ret_addr = (Branch_mem!= 2'b00)? inst_addr_id:inst_addr;
-	//assign ret_addr = inst_addr_mem;
+	//assign ret_addr = (Branch_mem!= 2'b00)? inst_addr_id:inst_addr;
+	assign ret_addr = (inst_addr_mem==0 )?((inst_addr_exe == 0)?((inst_addr_id == 0)?inst_addr:inst_addr_id):inst_addr_exe):inst_addr_mem;
 	
 
 
@@ -372,7 +398,7 @@ module Data_path(
 	
 	
 	mux2to1_32  ALU_A_Choose (.b(data_rs_exe[31:0]),
-							.a({26'b0,Imm_32_exe[10:6]}),  
+							.a({27'b0,Imm_32_exe[10:6]}),  
 						  .sel(ALUSrc_A_exe), 
 						  .o(ALU_A[31:0]));
 

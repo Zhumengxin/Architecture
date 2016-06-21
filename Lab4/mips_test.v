@@ -43,6 +43,9 @@ module mips_test;
 	wire [3:0] LCDDAT;
 	reg[31:0] count,count1;
 	reg ir_in;
+	reg [31:0] a,b;
+	wire equal;
+	
 	// Instantiate the Unit Under Test (UUT)
 	mips_top uut (
 		.CCLK(CCLK), 
@@ -75,6 +78,8 @@ module mips_test;
 		count=0;
 		count1=0;
 		ir_in=0;
+		a = 0;
+		b = 0;
 		// Wait 100 ns for global reset to finish
 		#100;
       //count=1;
@@ -83,6 +88,8 @@ module mips_test;
 		
 
 	end
+	
+	//assign equal = (a==b)?1:0;
 	always begin
 			CCLK = ~CCLK;
 			count = count + 1;
@@ -93,12 +100,17 @@ module mips_test;
 				BTNS=1;
 				count = 0;
 				count1 = count1 + 1;
-				if(count1 == 32'hA)begin
+				if(count1 == 32'hB)begin
+					BTNW=1;
+					
+				end
+				if(count1 == 32'hC)begin
+					BTNW=0;
+				end
+				if(count1 == 32'h21)begin
 					BTNW=1;
 					count1=0;
 				end
-
-				
 				
 				//count1 =0;
 			end

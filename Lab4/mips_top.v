@@ -86,7 +86,8 @@ module mips_top (
 	always @(posedge clk_cpu) begin
 		real_int <= 0;
 		int_cause <=0;
-		if (~btn_int_prev && (btn_int || btn_int2)) begin
+		//if (~btn_int_prev && (btn_int || btn_int2)) begin
+		if ((btn_int || btn_int2)) begin
 			real_int <= 1;
 			int_cause <= (btn_int)?0:1;
 		end

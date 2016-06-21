@@ -69,9 +69,11 @@ module SCPU(// debug
 	 //assign mem_wen=mem_w;
 
 	 //int var
+	 wire return_en;
 	 wire ir_en;
    	 wire [31:0] ret_addr;
    	 wire jump_en;
+   	 wire jump_sig;
    	 wire [31:0] jump_addr;
    	 wire [1:0] int_type;
      wire [4:0] cp_addr_r;
@@ -129,9 +131,10 @@ module SCPU(// debug
 		.ForwardA(ForwardA),
 		.ForwardB(ForwardB),
 		.ForwardM(ForwardM),
+		.return_en(return_en),
 	 	 .int_type(int_type),//out 2
     	.ir_en(ir_en),
-	 	.jump_en(jump_en)
+	 	.jump_en(jump_sig)
 		
 	 );
 	 
@@ -196,6 +199,8 @@ module SCPU(// debug
 	    .cp_data_w(cp_data_w),//out 32
 	    .ret_addr(ret_addr),//out 32
 	    .jump_en(jump_en),//in 1
+	    .return_en(return_en),
+	    .jump_sig(jump_sig),
 	    .jump_addr(jump_addr)//in 32
 	 );
 
@@ -222,6 +227,7 @@ assign cp_addr_w = cp_addr_r;
     .int_cause(int_cause),
     .ret_addr(ret_addr),//in
     .jump_en(jump_en),//out
+    .return_en(return_en),
     .jump_addr(jump_addr)//out
     );
 
