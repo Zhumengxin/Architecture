@@ -72,8 +72,9 @@ module SCPU_control(
 	output wire ForwardM,
 
 	output reg [1:0] int_type,//out 2
-    output reg ir_en,//out 1
+   	//input reg ir_en,//out 1
     input wire return_en,
+    input wire [2:0] int_stall,
 	 input wire jump_en
 	
     );
@@ -102,8 +103,9 @@ module SCPU_control(
 	wire [4:0] if_rd;
 
 	wire [1:0] Forwardb;
+	//reg [2:0] int_stall;
 	initial begin
-		ir_en <= 1;
+		//int_stall = 0;
 	end
 
 	//assign mem_w = MemWrite && (~MemRead);
@@ -225,13 +227,7 @@ module SCPU_control(
 	end
 	`endif
 
-	always @(posedge clk) begin
-		if (jump_en)
-			ir_en =ir_en + 1;
-		else if(return_en)
-			ir_en = 1;
-		else;
-	end
+	
 
 	always @(*) begin
 		if_rst=0;
@@ -260,17 +256,26 @@ module SCPU_control(
 			exe_en=0;
 			mem_en=0;
 			wb_en=0;
+			
 		end
 		`endif
+		
+		// else if (int_stall>0 && int_stall<2)begin
+		// 	if_en =0;
+		// 	id_rst = 1;
+		// end
+		else if(return_en) begin
+			//int_stall =1;
+			id_rst = 1; 
+		end
 		else if (jump_en) begin
 			
 			id_rst = 1;
 			exe_rst = 1;
 			mem_rst=1;
+			wb_rst =1;
 		end
-		else if(return_en) begin
-			id_rst = 1; 
-		end
+		
 		else if(Branch_mem != 2'b00) begin
 	   		//if_rst=1;
 	   		if_valid = 0;

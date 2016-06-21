@@ -108,7 +108,7 @@ module mips_test;
 					BTNW=0;
 				end
 				if(count1 == 32'h21)begin
-					BTNW=1;
+					//BTNW=1;
 					count1=0;
 				end
 				

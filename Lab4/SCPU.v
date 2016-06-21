@@ -70,17 +70,19 @@ module SCPU(// debug
 
 	 //int var
 	 wire return_en;
+	 wire [2:0]int_stall;
 	 wire ir_en;
    	 wire [31:0] ret_addr;
    	 wire jump_en;
    	 wire jump_sig;
+   	 wire return_sig;
    	 wire [31:0] jump_addr;
    	 wire [1:0] int_type;
      wire [4:0] cp_addr_r;
      wire [31:0] cp_data_r;
      wire [4:0] cp_addr_w;
      wire [31:0] cp_data_w;
-	 
+	 wire [31:0] EPCR;
 	 SCPU_control SCPU_control(
 		.clk(clk),
 		.rst(rst),
@@ -131,9 +133,10 @@ module SCPU(// debug
 		.ForwardA(ForwardA),
 		.ForwardB(ForwardB),
 		.ForwardM(ForwardM),
-		.return_en(return_en),
+		.return_en(return_sig),
 	 	 .int_type(int_type),//out 2
-    	.ir_en(ir_en),
+	 	 .int_stall(int_stall),
+    	//.ir_en(ir_en),
 	 	.jump_en(jump_sig)
 		
 	 );
@@ -193,14 +196,17 @@ module SCPU(// debug
 		.ForwardM(ForwardM),
 
 
-
+		.EPCR(EPCR),
 		.cp_addr_r(cp_addr_r),//out 5
 	    .cp_data_r(cp_data_r),//in 32
 	    .cp_data_w(cp_data_w),//out 32
 	    .ret_addr(ret_addr),//out 32
 	    .jump_en(jump_en),//in 1
 	    .return_en(return_en),
+	    .int_stall(int_stall),
 	    .jump_sig(jump_sig),
+	    .ir_en(ir_en),
+	    .return_sig(return_sig),
 	    .jump_addr(jump_addr)//in 32
 	 );
 
@@ -228,6 +234,8 @@ assign cp_addr_w = cp_addr_r;
     .ret_addr(ret_addr),//in
     .jump_en(jump_en),//out
     .return_en(return_en),
+    .EPCR(EPCR),
+    .int_stall(int_stall),
     .jump_addr(jump_addr)//out
     );
 

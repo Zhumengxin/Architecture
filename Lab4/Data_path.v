@@ -68,10 +68,14 @@ module Data_path(
 		output wire [4:0] cp_addr_r,//out 5
 		input wire [31:0] cp_data_r,//in 32
 		output wire [31:0] cp_data_w,//out 32
-		output wire [31:0] ret_addr,//out 32
+		output reg [31:0] ret_addr,//out 32
 		input wire jump_en,//in 1
+		input wire ir_en,
 		input wire return_en,
+		output reg [2:0]int_stall,
 		output reg jump_sig,
+		output reg return_sig,
+		input wire [31:0]EPCR,
 	    input wire [31:0] jump_addr//in 32
 
 		
@@ -154,11 +158,11 @@ module Data_path(
 			24: debug_data_signal[31:0] <= {13'b0,ALU_Control[2:0],  mem_r_control,mem_w_control,ALUSrc_A, ALUSrc_B,    0,Jal,Branch,   RegWrite,RegDst,DatatoReg,0,0,Branch2};
 			25: debug_data_signal[31:0] <= {13'b0,ALU_Control_exe[2:0],  mem_r_exe,mem_w_exe,ALUSrc_A_exe, ALUSrc_B_exe,    0,Jal_exe,Branch_exe,   RegWrite_exe,RegDst_exe,DatatoReg_exe,finalBranch};
 			26: debug_data_signal[31:0] <= {4'b0,  mem_r_mem,mem_w_mem,2'b0,    0,Jal_mem,Branch_mem,   RegWrite_mem,RegDst_mem,DatatoReg_mem,0,0,Branch_mem};
-			27: debug_data_signal[31:0] <= Mem_data;
-			28: debug_data_signal[31:0] <= {20'b0,3'b0,zero,3'b0,data_stall,3'b0,branch_stall};
-			29:	debug_data_signal[31:0] <= finalBranch;
-			30:debug_data_signal[31:0]  <= branch_pc_mem[31:0];
-			31: debug_data_signal[31:0] <= PC_out;
+			27: debug_data_signal[31:0] <= ret_addr;
+			28: debug_data_signal[31:0] <= EPCR;
+			29:	debug_data_signal[31:0] <= ir_en;
+			30:debug_data_signal[31:0]  <= jump_sig;
+			31: debug_data_signal[31:0] <= int_stall;
 			default: debug_data_signal[31:0] <= 32'hFFFF_FFFF;
 		endcase
 			//debug_data_signal[127:96] <= display_inst_data;
@@ -175,12 +179,17 @@ module Data_path(
 	//debug_data[95:56] = {inst_addr[7:0],inst_addr_id[7:0],inst_addr_exe[7:0],inst_addr_mem[7:0],inst_addr_wb[7:0]};
 	`endif
 	
-	reg jump_end_sig;
+	reg jump_end_sig,return_end_sig;
 	initial begin
 		inst_ren=0;
 		Branch_mem=0;
 		jump_sig =0;
 		jump_end_sig=0;
+		int_stall = 0;
+		ret_addr = 0;
+		return_sig = 0;
+		return_end_sig = 0;
+
 	end
 
 
@@ -198,26 +207,37 @@ module Data_path(
 						  .c(pc_4_if_wire[31:0]));
 
 
-	always @(*) begin
-		if (jump_en || return_en) begin
-			
+	always @(posedge clk) begin
+		if (jump_en) begin
 			jump_sig = 1;
-			
 		end
 		else if(jump_end_sig)begin
 			jump_sig = 0;
 		end
 		else;
 	end
+
+	always @(posedge clk) begin
+		if (return_en) begin
+			return_sig = 1;
+		end
+		else if(return_end_sig)begin
+			return_sig = 0;
+		end
+		else;
+	end
 	
 	always @(posedge clk) begin
 		if (if_rst) begin
+			
 			inst_ren <= 0;
 			inst_addr <= 0;
 		end
 		else if(if_valid==0) begin
+			
 			inst_ren <= 0;
 			inst_addr <=PC_out;
+			//ret_addr = (inst_addr_mem==0)?((inst_addr_exe == 0)?((inst_addr_id == 0)?inst_addr:inst_addr_id):inst_addr_exe):inst_addr_mem;
 		end
 		
 		//else if (branch_stall)begin
@@ -225,14 +245,29 @@ module Data_path(
 	//		inst_addr <= PC_out;
 	//	end
 		else if (if_en) begin
+			
+			if (return_sig  && int_stall == 0) begin
+				int_stall =1;	
+			end
+			else if(jump_sig)
+				int_stall = 0;
+			else if (int_stall>0 && int_stall<3)begin
+				int_stall = int_stall + 1;
+			end
 			if(jump_sig) begin
 				inst_ren <= 1;
 				inst_addr <= jump_addr;
 				jump_end_sig <= 1;
 			end
+			else if(return_sig) begin
+				inst_ren <= 1;
+				inst_addr <= jump_addr;
+				return_end_sig <= 1;
+			end
 			else begin
 				inst_ren <= 1;
 				jump_end_sig <= 0;
+				return_end_sig <= 0;
 			//inst_addr <= is_branch_mem ? alu_out_mem[15:0]<<2 : inst_addr_next; //?
 		    	inst_addr <= PC_out;
 			end
@@ -263,7 +298,7 @@ module Data_path(
 	// 						.o(PC_out[31:0]));
 
 	//assign ret_addr = (Branch_mem!= 2'b00)? inst_addr_id:inst_addr;
-	assign ret_addr = (inst_addr_mem==0 )?((inst_addr_exe == 0)?((inst_addr_id == 0)?inst_addr:inst_addr_id):inst_addr_exe):inst_addr_mem;
+	//assign ret_addr = (inst_addr_mem==0 )?((inst_addr_exe == 0)?((inst_addr_id == 0)?inst_addr:inst_addr_id):inst_addr_exe):inst_addr_mem;
 	
 
 
@@ -511,6 +546,8 @@ module Data_path(
 
 	 //wb
 	 always @(posedge clk) begin
+	 ret_addr = (inst_addr_mem==0 )?((inst_addr_exe == 0)?((inst_addr_id == 0)?inst_addr:inst_addr_id):inst_addr_exe):inst_addr_mem;
+			
 		if(wb_rst) begin 
 			RegWrite_wb <=0;
 			
@@ -530,6 +567,7 @@ module Data_path(
 			inst_data_wb <= inst_data_mem;
 			DatatoReg_wb <= DatatoReg_mem;
 			inst_addr_wb <= inst_addr_mem;
+
 		end	
 		RegWrite_wb <= RegWrite_mem & wb_en;
 

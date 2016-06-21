@@ -34,10 +34,12 @@ module cp0(
 	input wire [31:0] data_w, // write data
 	// control signal
 	input wire rst, // synchronous reset
-	input wire ir_en, // interrupt enable
+	output reg ir_en, // interrupt enable
 	input wire ir_in, // external interrupt input
 	input wire int_cause,
 	output wire return_en,
+	output reg [31:0] EPCR,
+	input wire [2:0]int_stall,
 	input wire [31:0] ret_addr, // target instruction address to store when interrupt occurred
 	output wire jump_en, // force jump enable signal when interrupt authorised or ERET occurred
 	output reg [31:0] jump_addr // target instruction address to jump to
@@ -50,14 +52,25 @@ module cp0(
 	reg eret = 0;
 	reg cause = 0;
 	reg [31:0] EHBR;
-	reg [31:0] EPCR;
+	//reg [31:0] EPCR;
 	reg [31:0] CAUSE;
 	initial begin
 		EHBR = 0;
 		EPCR = 0;
 		CAUSE = 0;
 		jump_addr = 0;
+		ir_en <= 1;
 	end
+
+	always @(posedge clk) begin
+		if (jump_en && (int_stall == 0 || int_stall == 3) && ir_en == 1 )
+			ir_en =0;//ir_en + 1;
+		else if(int_stall == 3)
+			ir_en = 1;
+		else;
+	end
+
+
 	always @(posedge clk) begin
 		cause <= int_cause;
 		if (rst)
@@ -75,8 +88,8 @@ module cp0(
 		else if (ir)
 			ir_valid <= 0; // prevent exception reenter
 	end
-	assign ir = ir_en & ir_wait & ir_valid;
-	
+	//assign ir = ir_en & ir_wait & ir_valid;
+	assign ir = ir_en & ir_wait;
 	assign jump_en = ir;//||eret ;//|| ret_flag; 
 	assign return_en  = eret;
 	/*always @(posedge clk) begin
@@ -119,7 +132,7 @@ module cp0(
 	
 	always @(posedge clk) begin
 		
-		if(ir)begin
+		if(ir && (int_stall == 0 || int_stall == 3))begin
 			EPCR <= ret_addr;
 			CAUSE <= cause;
 			//add one register: CAUSE

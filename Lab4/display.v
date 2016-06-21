@@ -48,6 +48,8 @@ module display (
 				strdata[71:0] <= data_value;
 				end
 			3'b001:begin
+				strdata[255:136] <= {"F",num2str(data[127:124]),num2str(data[123:120]),"D",num2str(data[119:116]),num2str(data[115:112]),"E",num2str(data[111:108]),num2str(data[107:104]),"M",num2str(data[103:100]),num2str(data[99:96]),"W",num2str(data[95:92]),num2str(data[91:88])};
+				
 				case (addr[4:0])
 				// datapath debug signals, MUST be compatible with 'debug_data_signal' in 'datapath.v'
 				0: strdata[127:72] <= "IF-ADDR";
